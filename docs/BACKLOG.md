@@ -19,6 +19,9 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [ ] P2 Filtre rapide par actif / sens sur les cartes.
 - [ ] P2 Mini-graphique (SVG) des 48 dernières bougies 1h sur chaque carte avec niveaux entrée/SL/TP.
 - [x] P1 Bandeau « radar en retard » au-dessus des opportunités si le dernier scan date de plus de 30 min (produit, 10/11).
+- [x] P1 « Paper-trading en cours » : seuls les trades radar (live/explore) sont visibles, les trades labo sont repliés dans un tiroir (produit, 10/11 17h).
+- [x] P2 Radar marché : colonnes funding coupées sur desktop (prix passé sous le symbole, titres sur 2 lignes) (produit, 10/11 17h).
+- [ ] P2 Encart « Opportunités » vide alors que le labo a 12 signaux : afficher une ligne « 0 signal radar · N en labo » pour qu'on comprenne que le scan tourne.
 - [ ] P3 Mobile : les libellés « Stop +0,96 % » / « TP2 −7,70 % » passent sur 2 lignes dans les cases niveaux (raccourcir ou réduire la police).
 - [ ] P3 Mode « pré-alerte » : setup en formation (pas encore validé).
 

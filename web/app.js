@@ -236,13 +236,18 @@ function tradeR(t) {
 }
 
 function renderOpen() {
-  const ts = (state.openTrades || []).slice().sort((a, b) => (a.status === b.status ? b.openTime - a.openTime : SHOWN.has(a.status) ? -1 : 1));
-  $('open-count').textContent = ts.length ? `(${ts.length})` : '';
-  if (!ts.length) { $('open').innerHTML = '<div class="empty">Aucun trade papier ouvert.</div>'; return; }
-  $('open').innerHTML = `<div class="tablewrap"><table><thead><tr><th>Actif</th><th>Sens</th><th>Stratégie</th><th>Entrée</th><th>Stop</th><th>TP1</th><th>TP2</th><th>Prix</th><th>R live</th><th>Depuis</th></tr></thead><tbody>${ts.map((t) => {
+  const all = (state.openTrades || []).slice().sort((a, b) => b.openTime - a.openTime);
+  const radar = all.filter((t) => t.status !== 'shadow'); // live + explore (+ anciens statuts) : ce que tu peux réellement trader
+  const lab = all.filter((t) => t.status === 'shadow');
+  $('open-count').textContent = all.length ? `(${radar.length} radar${lab.length ? ` · ${lab.length} labo` : ''})` : '';
+  const table = (ts) => `<div class="tablewrap"><table><thead><tr><th>Actif</th><th>Sens</th><th>Stratégie</th><th>Entrée</th><th>Stop</th><th>TP1</th><th>TP2</th><th>Prix</th><th>R live</th><th>Depuis</th></tr></thead><tbody>${ts.map((t) => {
     const r = tradeR(t);
-    return `<tr data-sym="${esc(t.symbol)}" data-id="${esc(t.id)}"><td><b>${esc(sym(t.symbol))}</b></td><td><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td>${esc(t.strategy)} ${t.status === 'shadow' ? '<span class="tag">labo</span>' : ''}</td><td>${px(t.entry)}</td><td>${px(t.sl)}${t.tp1Hit ? ' <span class="tag ok">BE</span>' : ''}</td><td>${px(t.tp1)}</td><td>${px(t.tp2)}</td><td class="lp">${px(live[t.symbol] ?? t.price)}</td><td class="lr ${cls(r)}"><b>${r2(r)}</b></td><td>${ago(t.openTime)}</td></tr>`;
+    return `<tr data-sym="${esc(t.symbol)}" data-id="${esc(t.id)}"><td><b>${esc(sym(t.symbol))}</b></td><td><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td>${esc(t.strategy)} ${t.status === 'shadow' ? '<span class="tag">labo</span>' : t.status === 'explore' ? '<span class="tag warn">🧪</span>' : ''}</td><td>${px(t.entry)}</td><td>${px(t.sl)}${t.tp1Hit ? ' <span class="tag ok">BE</span>' : ''}</td><td>${px(t.tp1)}</td><td>${px(t.tp2)}</td><td class="lp">${px(live[t.symbol] ?? t.price)}</td><td class="lr ${cls(r)}"><b>${r2(r)}</b></td><td>${ago(t.openTime)}</td></tr>`;
   }).join('')}</tbody></table></div>`;
+  const wasOpen = !!document.querySelector('#open details[open]'); // garder le tiroir ouvert au rafraîchissement
+  const labR = lab.reduce((a, t) => a + (tradeR(t) || 0), 0);
+  $('open').innerHTML = (radar.length ? table(radar) : '<div class="empty">Aucun trade radar ouvert.</div>')
+    + (lab.length ? `<details class="panel"${wasOpen ? ' open' : ''}><summary>🧪 ${lab.length} trade(s) labo en cours <span class="muted">(stratégies en test, à ne pas trader · ${r2(labR)} cumulés)</span></summary>${table(lab)}</details>` : '');
 }
 
 function statusTag(st) {
@@ -292,7 +297,7 @@ function sparkline(curve) {
 
 function renderMarket() {
   const m = state.market || {};
-  const tbl = (title, rows, fmt) => `<div class="tablewrap"><table><thead><tr><th>${title}</th><th></th></tr></thead><tbody>${(rows || []).map((r) => `<tr><td><b>${esc(sym(r.symbol))}</b> <span class="muted">${px(r.last)}</span></td><td>${fmt(r)}</td></tr>`).join('')}</tbody></table></div>`;
+  const tbl = (title, rows, fmt) => `<div class="tablewrap"><table><thead><tr><th>${title}</th><th></th></tr></thead><tbody>${(rows || []).map((r) => `<tr><td><b>${esc(sym(r.symbol))}</b><span class="muted mpx">${px(r.last)}</span></td><td class="num">${fmt(r)}</td></tr>`).join('')}</tbody></table></div>`;
   const ch = (r) => `<span class="${cls(r.change24h)}">${pct(r.change24h)}</span>`;
   const fu = (r) => `<span class="${cls(r.funding)}">${(r.funding * 100).toFixed(3)}%/h</span>`;
   $('market').innerHTML = tbl('🚀 Top hausses 24h', m.gainers, ch) + tbl('🩸 Top baisses 24h', m.losers, ch) + tbl('🔥 Funding le plus haut (longs payent)', m.fundingHigh, fu) + tbl('🧊 Funding le plus bas (shorts payent)', m.fundingLow, fu);
