@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-10 14h10 UTC (point santé)
-- **Santé** : ✅ scan régulier : 32 runs, un toutes les ~7 min depuis 11:04 (aucun trou > 7 min), 0 erreur, dernier à 14:11 UTC. Le problème de cadence de 11 h est réglé.
-- **Live** : 2 premiers trades clos, tous deux gagnants : `trend_pullback@1` short SOL **+1,39R** et XRP **+1,17R** (TP1 atteint, puis sortie au breakeven), soit **+2,56R** au total, 0 perte. 4 trades ouverts (XBT, HYPE avec TP1 déjà touché, ADA, DOGE). MAE max −0,32R.
-- **Alerte Stratège** : 6/6 trades sont du `trend_pullback` short. Le risque est corrélé : un rebond BTC toucherait les 4 positions ouvertes en même temps (pire cas ≈ −3R sur la journée, sous la limite de 6R). 2 trades seulement : statistiquement non significatif, aucune décision possible.
+## 🔎 Analyste · 2026-11-10 17h10 UTC (point santé)
+- **Santé** : ✅ 58 runs, un toutes les ~7 min (écart max 7 min depuis 11:04), 0 erreur, dernier à 17:04 UTC. Le bandeau « radar en retard » ne devrait pas apparaître.
+- **Live** : 6 trades radar clos, **+4,77R** (5 gagnants, 1 perdant). `trend_pullback@1` short : 5/5 gagnants, **+5,77R**, toujours TP1 puis sortie au breakeven (MFE 1,6 à 2,5R, le TP2 à 8R n'est jamais atteint). `failed_breakout@1` long HYPE : −1R (stop, MFE 0). XBT reste ouvert (+0,73R acquis). Pire journée : +4,77R ; série de pertes max : 1. Labo (shadow) : 1 seul clos (`breakout_volume` long PEPE −1R), 12 ouverts presque tous short.
+- **Alerte Stratège** : les 6 trades `trend_pullback` étaient tous des shorts dans le sens de BTC 4h (baissier), ce qui va dans le sens du filtre de régime mais ne le prouve pas (n = 6, un seul régime). Le seul perdant est le seul long. Exposition encore à ~95 % short : un rebond BTC coûterait cher au labo.
 
 ## 🧠 Stratège · 2026-11-10 15h30 UTC
 - **Live** : 2 trades clos (+2,56R, `trend_pullback@1` short), 6 ouverts → < 30 trades, aucune décision. Aucune nouvelle version (garde-fou 24 h).
