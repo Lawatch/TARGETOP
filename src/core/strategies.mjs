@@ -174,7 +174,61 @@ function failedBreakout(ctx, p) {
   return null;
 }
 
+// --- Famille « volatilité » : compression des bandes de Bollinger puis expansion avec volume.
+function squeezeBreakout(ctx, p) {
+  const { s15, i, tfb = '15m' } = ctx;
+  if (i < p.lookback + 5) return null;
+  const c = s15.candles[i];
+  const a = s15.atr14[i], w = s15.bbWidth, up = s15.bbUpper[i], dn = s15.bbLower[i], vs = s15.volSma20[i];
+  if (![a, up, dn, vs, w[i - 1]].every(ok) || vs <= 0) return null;
+  // la largeur des bandes juste avant doit être dans le bas de sa distribution récente
+  const hist = w.slice(i - p.lookback, i).filter(ok).sort((x, y) => x - y);
+  if (hist.length < p.lookback * 0.8) return null;
+  const rank = hist.findIndex((x) => x >= w[i - 1]) / hist.length;
+  if (rank < 0 || rank > p.maxWidthPct) return null;
+  const volRatio = c.v / vs;
+  if (volRatio < p.minVolRatio) return null;
+  const q = clamp01(0.5 * (1 - rank / p.maxWidthPct) + 0.5 * norm(volRatio, p.minVolRatio, p.minVolRatio * 2.5));
+  if (c.c > up) return { side: 'long', entry: c.c, sl: c.c - p.riskAtr * a, quality: q,
+    reasons: [`Compression de volatilité (largeur Bollinger dans les ${Math.round(rank * 100)} % les plus bas)`, `Expansion haussière ${tfb} hors bande 2,5σ`, `Volume x${volRatio.toFixed(1)}`] };
+  if (c.c < dn) return { side: 'short', entry: c.c, sl: c.c + p.riskAtr * a, quality: q,
+    reasons: [`Compression de volatilité (largeur Bollinger dans les ${Math.round(rank * 100)} % les plus bas)`, `Expansion baissière ${tfb} hors bande 2,5σ`, `Volume x${volRatio.toFixed(1)}`] };
+  return null;
+}
+
+// --- Famille « retour à la moyenne court terme » : RSI(2) extrême dans le sens de la tendance longue (EMA200).
+function rsi2Pullback(ctx, p) {
+  const { s15, i } = ctx;
+  if (i < 210) return null;
+  const c = s15.candles[i];
+  const a = s15.atr14[i], r2 = s15.rsi2[i], e200 = s15.ema200[i];
+  if (![a, r2, e200].every(ok)) return null;
+  if (c.c > e200 && r2 < p.rsiLow) return { side: 'long', entry: c.c, sl: c.c - p.riskAtr * a, quality: clamp01(norm(p.rsiLow - r2, 0, p.rsiLow)),
+    reasons: ['Tendance longue haussière (prix > EMA200)', `Excès vendeur court terme (RSI2 ${r2.toFixed(0)})`, 'Pari : rebond rapide vers la moyenne'] };
+  if (c.c < e200 && r2 > 100 - p.rsiLow) return { side: 'short', entry: c.c, sl: c.c + p.riskAtr * a, quality: clamp01(norm(r2 - (100 - p.rsiLow), 0, p.rsiLow)),
+    reasons: ['Tendance longue baissière (prix < EMA200)', `Excès acheteur court terme (RSI2 ${r2.toFixed(0)})`, 'Pari : rechute rapide vers la moyenne'] };
+  return null;
+}
+
+// --- Famille « suivi de tendance » : cassure de canal dans une tendance établie, stop large et stop suiveur (gains asymétriques).
+function donchianTrend(ctx, p) {
+  const { s15, i } = ctx;
+  if (i < 210) return null;
+  const c = s15.candles[i];
+  const a = s15.atr14[i], hi = s15.donHi48[i], lo = s15.donLo48[i], e50 = s15.ema50[i], e200 = s15.ema200[i];
+  if (![a, hi, lo, e50, e200].every(ok)) return null;
+  const strength = Math.abs(e50 - e200) / a;
+  if (c.c > hi && e50 > e200 && c.c > e50) return { side: 'long', entry: c.c, sl: c.c - p.riskAtr * a, quality: clamp01(norm(strength, 0, 10)),
+    reasons: [`Nouveau plus haut 48 bougies (${fmt(hi)})`, 'Tendance établie (EMA50 > EMA200)', 'Suivi de tendance : petits gains rares, gros gains possibles'] };
+  if (c.c < lo && e50 < e200 && c.c < e50) return { side: 'short', entry: c.c, sl: c.c + p.riskAtr * a, quality: clamp01(norm(strength, 0, 10)),
+    reasons: [`Nouveau plus bas 48 bougies (${fmt(lo)})`, 'Tendance établie (EMA50 < EMA200)', 'Suivi de tendance : petits gains rares, gros gains possibles'] };
+  return null;
+}
+
 export const DETECTORS = {
+  squeeze_breakout: squeezeBreakout,
+  rsi2_pullback: rsi2Pullback,
+  donchian_trend: donchianTrend,
   failed_breakout: failedBreakout,
   trend_pullback: trendPullback,
   breakout_volume: breakoutVolume,
@@ -188,6 +242,8 @@ export function runStrategy(strat, ctx, meta = {}) {
   if (!fn) return null;
   const raw = fn(ctx, strat.params);
   if (!raw) return null;
+  // Filtre de sens générique : params.sides = "long" | "short" (absent = les deux)
+  if (strat.params.sides && strat.params.sides !== 'both' && raw.side !== strat.params.sides) return null;
   // Filtre de régime générique : params.regime = "with" (dans le sens de la tendance de fond EMA20/EMA50 du TF supérieur)
   // ou "against" (contre). Absent = pas de filtre.
   if (strat.params.regime) {

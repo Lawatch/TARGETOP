@@ -39,7 +39,8 @@ async function cached(sym, tf, from) {
 }
 
 const tickers = await fetchTickers();
-const syms = tickers.filter((t) => t.tag === 'perpetual' && t.symbol.startsWith('PF_') && !t.suspended)
+const excluded = new Set(settings.universe.exclude || []);
+const syms = tickers.filter((t) => t.tag === 'perpetual' && t.symbol.startsWith('PF_') && !t.suspended && !excluded.has(t.symbol))
   .sort((a, b) => (b.volumeQuote || 0) - (a.volumeQuote || 0)).slice(0, nSym);
 const warm = 250;
 const from15 = now - (days * 96 + warm) * MS15;

@@ -71,3 +71,12 @@ Décisions :
 - Nouvelles variantes **shadow** : `failed_breakout_regime` (filtre tendance) et `failed_breakout_quick` (TP 1R/2R, 24 h).
 - Univers : 50 perps scannés (labo), live limité au top 25.
 - Les 2 stratégies live restent live (exception de démarrage), badge « non prouvée ».
+
+## 2026-11-10 (fin d'après-midi) — Mode exploration
+
+Décision utilisateur : accepter un peu de risque pour découvrir plus vite. Nouveau statut **`explore`** (radar, demi-risque).
+- Univers nettoyé : exclusion des actions tokenisées / matières premières (AMZNX, NVDAX, XAU, WTIOIL, NATGAS…).
+- 3 nouvelles familles en labo : `squeeze_breakout` (−0,15R), `rsi2_pullback` (−0,08R), `donchian_trend`.
+- `donchian_trend` (long seulement, 1h, stop 2,5 ATR, suiveur 3 ATR après TP1 2R) — 180 j / 25 cryptos : **+0,14R, PF 1,23** (−0,01 / +0,25) → **`explore`**.
+- `trend_pullback` (−0,06R) et `failed_breakout` (−0,05R) sur 180 j / 25 cryptos : **`live` → `explore`** (demi-risque). Aucune stratégie n'est `live` tant qu'elle n'a pas prouvé un avantage en réel. Coupe automatique si < −0,20R après 15 trades.
+- Ajout des filtres génériques `params.sides` (long/short) et `params.regime` (with/against).

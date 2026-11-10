@@ -26,6 +26,11 @@ sur le challenge ; on ne lance en réel que ce qui a prouvé un avantage après 
 | 24/11 | Revue go/no-go par stratégie (critères ci-dessous) ; mode d'emploi du lancement sur le site. |
 | 01/12 | Lancement réel avec **uniquement** les stratégies « GO ». |
 
+## Mode exploration (validé par l'utilisateur le 10/11)
+On prend du risque sur le **nombre d'idées testées**, pas sur la taille des positions : statut `explore` = visible dans
+le radar à **demi-risque**, coupé vite si ça perd, post-mortem dans `docs/LESSONS.md`, nouvelle idée derrière.
+Au lancement : stratégies `live` à risque plein, stratégies `explore` à demi-risque, rien d'autre.
+
 ## Critères GO (par stratégie) pour le 1er décembre
 - Backtest 180 j / 25 symboles : espérance > +0,05R après frais, positive sur les 2 moitiés.
 - Paper live : ≥ 30 trades, espérance > 0, drawdown < 10R, aucune journée pire que −6R (= −3 % à 0,5 %/trade).

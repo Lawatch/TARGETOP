@@ -1,12 +1,12 @@
 {
-  "_doc": "Statuts: live = affiché comme opportunité + paper-tradé ; shadow = labo, paper-tradé et affiché à part ; disabled = ignoré. Toute modif de params => incrémenter version (le journal garde id@version). params.tf = timeframe de base (15m|1h).",
+  "_doc": "Statuts: live = validée (risque plein) ; explore = validée en backtest 180 j, testée en live à DEMI-risque ; shadow = labo (paper-trading seulement, affiché à part) ; disabled = arrêtée. Toute modif de params => incrémenter version (le journal garde id@version). params.tf = 15m|1h ; params.sides = long|short ; params.regime = with|against.",
   "strategies": [
     {
       "id": "failed_breakout",
       "label": "Faux breakout (piège)",
       "detector": "failed_breakout",
       "version": 1,
-      "status": "live",
+      "status": "explore",
       "params": {
         "tf": "1h",
         "minVolRatio": 1.2,
@@ -25,7 +25,7 @@
       "label": "Pullback de tendance",
       "detector": "trend_pullback",
       "version": 1,
-      "status": "live",
+      "status": "explore",
       "params": {
         "minAdx1h": 20,
         "pullbackBars": 6,
@@ -135,6 +135,55 @@
         "tp2R": 3,
         "maxHoldHours": 12,
         "tf": "15m"
+      }
+    },
+    {
+      "id": "squeeze_breakout",
+      "label": "Explosion après compression",
+      "detector": "squeeze_breakout",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "tf": "1h",
+        "lookback": 120,
+        "maxWidthPct": 0.2,
+        "minVolRatio": 1.5,
+        "riskAtr": 1.5,
+        "tp1R": 1.5,
+        "tp2R": 6,
+        "trailAtr": 2,
+        "maxHoldHours": 72
+      }
+    },
+    {
+      "id": "rsi2_pullback",
+      "label": "Rebond court terme (RSI2)",
+      "detector": "rsi2_pullback",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "tf": "1h",
+        "rsiLow": 8,
+        "riskAtr": 2,
+        "tp1R": 0.8,
+        "tp2R": 1.6,
+        "maxHoldHours": 24
+      }
+    },
+    {
+      "id": "donchian_trend",
+      "label": "Suivi de tendance (canal, long)",
+      "detector": "donchian_trend",
+      "version": 1,
+      "status": "explore",
+      "params": {
+        "tf": "1h",
+        "riskAtr": 2.5,
+        "tp1R": 2,
+        "tp2R": 12,
+        "trailAtr": 3,
+        "maxHoldHours": 240,
+        "sides": "long"
       }
     }
   ]

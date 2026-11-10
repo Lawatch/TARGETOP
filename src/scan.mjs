@@ -15,6 +15,8 @@ const readJson = (p, def) => { try { return JSON.parse(fs.readFileSync(p, 'utf8'
 const settings = readJson(path.join(root, 'config/settings.json'));
 const stratCfg = readJson(path.join(root, 'config/strategies.json'));
 const strategies = stratCfg.strategies.filter((s) => s.status !== 'disabled');
+// « Affichées » = live (validées) + explore (exploration à risque réduit) : signaux du radar principal.
+const SHOWN = new Set(['live', 'explore']);
 const stratById = Object.fromEntries(stratCfg.strategies.map((s) => [s.id, s]));
 
 fs.mkdirSync(dataDir, { recursive: true });
@@ -29,7 +31,8 @@ const health = readJson(P('health.json'), { runs: [] });
 
 // 1) Univers
 const tickers = await fetchTickers();
-const perps = tickers.filter((t) => t.tag === 'perpetual' && t.symbol.startsWith('PF_') && !t.suspended && !t.postOnly);
+const excluded = new Set(settings.universe.exclude || []);
+const perps = tickers.filter((t) => t.tag === 'perpetual' && t.symbol.startsWith('PF_') && !t.suspended && !t.postOnly && !excluded.has(t.symbol));
 const byVol = [...perps].sort((a, b) => (b.volumeQuote || 0) - (a.volumeQuote || 0));
 const universe = byVol.filter((t) => (t.volumeQuote || 0) >= settings.universe.minVolumeQuoteUsd).slice(0, settings.universe.maxSymbols);
 for (const s of settings.universe.always) if (!universe.find((u) => u.symbol === s)) { const t = perps.find((p) => p.symbol === s); if (t) universe.push(t); }
@@ -50,7 +53,7 @@ const res = await mapLimit(universe, 5, async (t) => {
 const freshSignals = [];
 res.forEach((r, n) => {
   if (!r.ok) return errors.push(`${universe[n].symbol}: ${r.error}`);
-  freshSignals.push(...r.value.filter((s) => stratById[s.strategy]?.status !== 'live' || liveSet.has(s.symbol)));
+  freshSignals.push(...r.value.filter((s) => !SHOWN.has(stratById[s.strategy]?.status) || liveSet.has(s.symbol)));
 });
 
 // 3) Signaux actifs (frais + précédents encore valides)
@@ -60,7 +63,7 @@ const active = new Map();
 for (const s of prevState.signals || []) if (now - s.closeTime < validMs(s) && stratById[s.strategy]?.status !== 'disabled') active.set(key(s), s);
 for (const s of freshSignals) if (now - s.closeTime < validMs(s) && !active.has(key(s))) active.set(key(s), { ...s, firstSeen: now });
 const signals = [...active.values()]
-  .filter((s) => s.status !== 'live' || s.score >= settings.minScoreLive)
+  .filter((s) => !SHOWN.has(stratById[s.strategy]?.status) || s.score >= settings.minScoreLive)
   .map((s) => ({ ...s, status: stratById[s.strategy]?.status ?? s.status, label: stratById[s.strategy]?.label, price: priceOf(s.symbol), change24h: tick[s.symbol]?.change24h, funding: tick[s.symbol]?.relativeFundingRate }))
   .sort((a, b) => b.score - a.score);
 
@@ -78,13 +81,13 @@ const opened = [];
 for (const s of [...freshSignals].sort((a, b) => b.score - a.score)) {
   const strat = stratById[s.strategy];
   if (!strat || strat.status === 'disabled') continue;
-  if (strat.status === 'live' && s.score < settings.minScoreLive) continue;
+  if (SHOWN.has(strat.status) && s.score < settings.minScoreLive) continue;
   const same = journal.trades.filter((t) => t.symbol === s.symbol && t.strategy === s.strategy);
   if (same.some((t) => t.state === 'open' || t.signalBarTime === s.barTime)) continue;
   const lastClose = Math.max(0, ...same.map((t) => t.closeTime || 0));
   if (now - lastClose < settings.cooldownBarsAfterClose * (strat.params.tf === '1h' ? 4 : 1) * MS15) continue;
   if (journal.trades.filter((t) => t.state === 'open' && t.strategy === s.strategy).length >= settings.maxOpenTradesPerStrategy) continue;
-  if (strat.status === 'live' && journal.trades.filter((t) => t.state === 'open' && t.status === 'live' && t.side === s.side).length >= settings.maxSameSideLiveSignals) continue;
+  if (SHOWN.has(strat.status) && journal.trades.filter((t) => t.state === 'open' && SHOWN.has(t.status) && t.side === s.side).length >= settings.maxSameSideLiveSignals) continue;
   const px = priceOf(s.symbol);
   const anchored = px ? reanchor(s, px, strat) : null;
   if (!anchored) continue;
@@ -98,7 +101,7 @@ for (const s of [...freshSignals].sort((a, b) => b.score - a.score)) {
 
 // 6) Statistiques
 const all = journal.trades;
-const liveTrades = all.filter((t) => t.status === 'live');
+const liveTrades = all.filter((t) => SHOWN.has(t.status)); // tout ce qui est montré dans le radar principal
 const stats = {
   live: computeStats(liveTrades),
   all: (({ curve, ...s }) => s)(computeStats(all)),

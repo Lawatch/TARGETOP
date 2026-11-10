@@ -119,7 +119,7 @@ test('toutes les stratégies de la config tournent sans erreur sur données synt
   for (let i = 300; i < 1600; i++) n += evaluateAt(prep, (i + 1) * Q, cfg.strategies, { funding: 0.0005 }, 'replay').length;
   assert.ok(n >= 0);
   for (const s of cfg.strategies) {
-    assert.ok(['live', 'shadow', 'disabled'].includes(s.status), s.id);
+    assert.ok(['live', 'explore', 'shadow', 'disabled'].includes(s.status), s.id);
     assert.ok(Number.isInteger(s.version), s.id);
     assert.ok(s.params.tp2R >= s.params.tp1R, s.id);
   }

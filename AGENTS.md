@@ -34,9 +34,8 @@ git fetch origin gh-pages && git show origin/gh-pages:data/journal.json > /tmp/j
 
 Lire `docs/LAUNCH_PLAN.md` (jalons, critères GO). Pendant le sprint :
 - **Standard de backtest : `--days 180 --symbols 25 --split`** (positif sur les 2 moitiés) avant tout passage en live.
-- Le Stratège peut ajouter **jusqu'à 2 variantes `shadow` par passage** (le labo ne coûte rien et accélère l'apprentissage),
-  en gardant le garde-fou d'1 nouvelle version par stratégie *live* par 24 h. Limiter le labo à ~10 stratégies actives :
-  désactiver (`disabled`) les variantes clairement perdantes après 30 trades.
+- Le Stratège peut ajouter **jusqu'à 2 variantes/familles `shadow` par passage** (le labo ne coûte rien et accélère
+  l'apprentissage), en gardant le garde-fou d'1 nouvelle version par stratégie `explore`/`live` par 24 h.
 - **Ce qu'on ne fait pas** sous prétexte d'aller vite : passer du live en 15m/5m (les frais détruisent l'avantage, testé),
   élargir le live aux alts peu liquides (testé : l'avantage disparaît), assouplir les critères GO.
 - L'Analyste suit les jalons du plan et signale tout retard dans `reports/LATEST.md`.
@@ -49,8 +48,8 @@ chaque heure et chaque rôle toutes les 3 h. Agilité ≠ révolution : à chaqu
 mesurable ou rien**. Un passage « RAS » (rien à signaler) est un bon passage s'il est justifié.
 
 Garde-fous anti-agitation :
-- Stratège : **au plus 1 nouvelle version par stratégie par 24 h** (sauf bug), et aucune décision live/shadow
-  sur moins de 30 trades. Entre deux, il travaille en backtest, prépare des variantes `shadow`, ou ne fait rien.
+- Stratège : **au plus 1 nouvelle version par stratégie par 24 h** (sauf bug) ; promotions/coupes uniquement selon
+  les seuils du cycle de vie ci-dessous. Entre deux, il travaille en backtest, prépare des variantes `shadow`, ou ne fait rien.
 - Produit : 1 changement visible max par passage ; pas de refonte sans besoin constaté.
 - Analyste : rapport court ; un rapport complet seulement toutes les 12 h, sinon un point santé de 3 lignes.
 - Chaque passage commence par `git pull --rebase` et lit la fin de `reports/LATEST.md` pour reprendre le relais.
@@ -59,6 +58,7 @@ Garde-fous anti-agitation :
 
 ### 1. 🔎 Analyste Live (QA & performance) — toutes les 3 h
 - Récupère `gh-pages` : fraîcheur du scan (`state.generatedAt` < 30 min ?), erreurs (`health.json`), trades ouverts/clos.
+- Rédige le post-mortem de chaque stratégie coupée dans `docs/LESSONS.md`.
 - Calcule : stats par stratégie@version, par sens, par actif, distribution des sorties (stop/BE/TP/temps), MFE/MAE moyens, écart live vs backtest.
 - Vérifie la conformité challenge : série de pertes max, pire journée en R (à 0,5 %/trade, la perte jour 3 % = 6R).
 - Écrit `reports/AAAA-MM-JJ-HHh-analyste.md` + remplace `reports/LATEST.md` (court : état, chiffres clés, alertes, recommandations).
@@ -75,17 +75,28 @@ Garde-fous anti-agitation :
 - Corrige les bugs, garde le site léger (aucune dépendance externe, aucun CDN : le PC pro bloque beaucoup de choses).
 - Vérifie le rendu (Playwright préinstallé : `require('playwright')`) après chaque modif du front.
 
-## Règles de promotion / rétrogradation (paper-trading live = juge de paix)
+## Cycle de vie des stratégies : explorer vite, couper vite, apprendre
 
-- Une stratégie **ne passe `live`** que si : backtest 90 j/25 symboles positif sur les 2 moitiés **et**
-  ≥ 30 trades papier live en `shadow` avec espérance > +0,05R et profit factor > 1,1.
-- Une stratégie `live` repasse **`shadow`** si, sur ses 30 derniers trades live : espérance < −0,10R,
-  ou drawdown > 12R.
-- **Modifier des paramètres = incrémenter `version`**. Les stats de la nouvelle version repartent de zéro
-  (l'ancienne reste visible dans le journal) : on ne mélange jamais deux versions.
-- Pas d'optimisation à outrance : préférer des règles simples, robustes, cohérentes sur plusieurs périodes.
-- Exception de démarrage : tant qu'aucune stratégie n'a 30 trades live, les 2 meilleures en backtest
-  restent `live` avec le badge « non prouvée » affiché sur le site.
+Philosophie validée par l'utilisateur : **on accepte de perdre un peu pour découvrir**, mais on ne confond pas
+« plus de risque » et « plus de profit » (une espérance de 0R reste 0 quelle que soit la taille : augmenter le
+risque d'une stratégie sans avantage ne fait qu'augmenter la casse). On prend donc du risque sur la **diversité
+des idées testées**, avec une mise réduite, pas sur la taille.
+
+`shadow` (labo, 0 risque) → `explore` (radar, **demi-risque**) → `live` (radar, risque plein) ; sortie : `disabled`.
+
+| Transition | Critère |
+|---|---|
+| idée → `shadow` | Libre. Le Stratège ajoute jusqu'à 2 variantes/familles nouvelles par passage (labo ≤ ~12 actives). |
+| → `explore` | Backtest `--days 180 --symbols 25 --split` : espérance ≥ +0,08R, PF ≥ 1,15, aucune moitié < −0,05R. **OU** labo ≥ 20 trades live avec espérance ≥ +0,10R. Max 4 stratégies en `explore`. |
+| `explore` → `live` | ≥ 30 trades live en `explore`, espérance > +0,05R, PF > 1,1, drawdown < 10R. |
+| `explore` → `shadow` | **Coupe rapide** : après ≥ 15 trades, espérance < −0,20R, ou drawdown > 8R. |
+| `live` → `explore` | Sur les 30 derniers trades : espérance < 0 ou drawdown > 12R. |
+| `shadow` → `disabled` | Après ≥ 30 trades, espérance < −0,15R (libère de la place dans le labo). |
+
+- **Modifier des paramètres = incrémenter `version`** (les stats repartent de zéro ; l'ancienne reste dans le journal). Changer le statut ne change pas la version.
+- **Chaque coupe donne lieu à un post-mortem** par l'Analyste dans `docs/LESSONS.md` : quels trades, quel régime de marché, quelle hypothèse était fausse, que tester ensuite. Le Stratège lit `docs/LESSONS.md` avant d'inventer une nouvelle idée.
+- **Diversité** : explorer des familles différentes (tendance, retour à la moyenne, volatilité, funding/open interest, force relative vs BTC, horaires de session…), pas seulement des réglages fins de la même idée.
+- Les perpétuels non-crypto (actions tokenisées, or, pétrole…) sont exclus via `settings.universe.exclude`.
 
 ## Règles de travail communes
 
