@@ -22,6 +22,8 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [x] P1 « Paper-trading en cours » : seuls les trades radar (live/explore) sont visibles, les trades labo sont repliés dans un tiroir (produit, 10/11 17h).
 - [x] P2 Radar marché : colonnes funding coupées sur desktop (prix passé sous le symbole, titres sur 2 lignes) (produit, 10/11 17h).
 - [ ] P2 Encart « Opportunités » vide alors que le labo a 12 signaux : afficher une ligne « 0 signal radar · N en labo » pour qu'on comprenne que le scan tourne.
+- [x] P2 Tableau Performance : lisible sur mobile (statut sous le nom, colonnes secondaires masquées < 600 px), stratégies du radar en tête puis tri par total R, PF au format français (produit, 10/11 20h).
+- [ ] P3 Mobile : la page est très longue (Radar marché = 4 tableaux empilés) ; envisager de replier le Radar marché par défaut sur mobile.
 - [ ] P3 Mobile : les libellés « Stop +0,96 % » / « TP2 −7,70 % » passent sur 2 lignes dans les cases niveaux (raccourcir ou réduire la police).
 - [ ] P3 Mode « pré-alerte » : setup en formation (pas encore validé).
 

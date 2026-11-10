@@ -264,21 +264,26 @@ function renderPerf() {
     k('Taux de réussite', L.winRate == null ? '–' : Math.round(L.winRate * 100) + ' %'),
     k('Espérance / trade', r2(L.expectancyR), cls(L.expectancyR)),
     k('Total', r2(L.totalR), cls(L.totalR)),
-    k('Profit factor', L.profitFactor ?? '–'),
+    k('Profit factor', L.profitFactor == null || !isFinite(L.profitFactor) ? '–' : L.profitFactor.toFixed(2).replace('.', ',')),
     k('Drawdown max', !L.maxDrawdownR ? '0R' : '-' + L.maxDrawdownR.toFixed(2) + 'R'),
     k(`Équivalent compte (${risk.risk}%/trade)`, L.totalR == null ? '–' : pct(L.totalR * risk.risk, 1), cls(L.totalR)),
   ].join('');
   $('equity').innerHTML = sparkline(L.curve || []);
   const strats = state.strategies || [];
   const byV = st.byStrategyVersion || {};
-  const rows = Object.entries(byV).sort((a, b) => b[1].trades - a[1].trades).map(([key, v]) => {
+  // Ce qui marche d'abord : stratégies du radar (live, explore) puis labo, triées par total R.
+  const rank = { live: 0, explore: 1, shadow: 2, disabled: 3 };
+  const pfTxt = (x) => (x == null || !isFinite(x) ? '–' : x.toFixed(2).replace('.', ','));
+  const name = (label, ver, tag) => `<b>${esc(label)}</b> <span class="muted">${esc(ver)}</span><br>${tag}`;
+  const rows = Object.entries(byV).map(([key, v]) => {
     const id = key.split('@')[0];
     const meta = strats.find((x) => x.id === id) || {};
     const isCur = meta.version && key.endsWith('@v' + meta.version);
-    return `<tr><td><b>${esc(meta.label || id)}</b> <span class="muted">${esc(key.split('@')[1])}</span></td><td>${isCur ? `${statusTag(meta.status)}` : '<span class="tag">ancienne</span>'}</td><td>${v.trades}</td><td>${v.winRate == null ? '–' : Math.round(v.winRate * 100) + ' %'}</td><td class="${cls(v.expectancyR)}">${r2(v.expectancyR)}</td><td class="${cls(v.totalR)}">${r2(v.totalR)}</td><td>${v.profitFactor ?? '–'}</td><td>${!v.maxDrawdownR ? '0R' : '-' + v.maxDrawdownR.toFixed(2) + 'R'}</td></tr>`;
+    return { o: isCur ? rank[meta.status] ?? 4 : 5, t: v.totalR || 0, html: `<tr><td>${name(meta.label || id, key.split('@')[1], isCur ? statusTag(meta.status) : '<span class="tag">ancienne</span>')}</td><td>${v.trades}</td><td class="opt">${v.winRate == null ? '–' : Math.round(v.winRate * 100) + ' %'}</td><td class="${cls(v.expectancyR)}">${r2(v.expectancyR)}</td><td class="${cls(v.totalR)}"><b>${r2(v.totalR)}</b></td><td class="opt">${pfTxt(v.profitFactor)}</td><td class="opt">${!v.maxDrawdownR ? '0R' : '-' + v.maxDrawdownR.toFixed(2) + 'R'}</td></tr>` };
   });
-  const noTrades = strats.filter((s) => !Object.keys(byV).some((k2) => k2.startsWith(s.id + '@'))).map((s) => `<tr><td><b>${esc(s.label)}</b> <span class="muted">v${s.version}</span></td><td>${statusTag(s.status)}</td><td colspan="6" class="muted">pas encore de trade clôturé</td></tr>`);
-  $('perf').innerHTML = `<div class="tablewrap"><table><thead><tr><th>Stratégie</th><th>Statut</th><th>Trades</th><th>Réussite</th><th>Espérance</th><th>Total</th><th>PF</th><th>DD max</th></tr></thead><tbody>${rows.join('') + noTrades.join('')}</tbody></table></div>`;
+  const noTrades = strats.filter((s) => !Object.keys(byV).some((k2) => k2.startsWith(s.id + '@'))).map((s) => ({ o: rank[s.status] ?? 4, t: -1e9, html: `<tr><td>${name(s.label, 'v' + s.version, statusTag(s.status))}</td><td colspan="6" class="muted">pas encore de trade clôturé</td></tr>` }));
+  const all = [...rows, ...noTrades].sort((x, y) => x.o - y.o || y.t - x.t);
+  $('perf').innerHTML = `<div class="tablewrap"><table class="perf"><thead><tr><th>Stratégie</th><th>Trades</th><th class="opt">Réussite</th><th>Espérance</th><th>Total</th><th class="opt">PF</th><th class="opt">DD max</th></tr></thead><tbody>${all.map((r) => r.html).join('')}</tbody></table></div>`;
   const cl = state.recentClosed || [];
   $('closed').innerHTML = cl.length ? `<div class="tablewrap"><table><thead><tr><th>Clôture</th><th>Actif</th><th>Sens</th><th>Stratégie</th><th>Sortie</th><th>Résultat</th></tr></thead><tbody>${cl.map((t) => `<tr><td>${ago(t.closeTime)}</td><td><b>${esc(sym(t.symbol))}</b></td><td><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td>${esc(t.strategy)}@v${t.version}${t.status === 'shadow' ? ' <span class="tag">labo</span>' : ''}</td><td>${esc(t.exitReason)}</td><td class="${cls(t.resultR)}"><b>${r2(t.resultR)}</b></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Pas encore de trade clôturé.</div>';
 }
