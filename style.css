@@ -60,3 +60,5 @@ footer{text-align:center;padding:20px}
 .mpx{display:block;font-size:11px}
 td.num{text-align:right}
 .market th{white-space:normal}
+.perf td:first-child{white-space:normal}.perf td:first-child .tag{margin-top:3px;display:inline-block}
+@media (max-width:600px){.perf .opt{display:none}}
