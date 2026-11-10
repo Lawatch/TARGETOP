@@ -15,3 +15,8 @@
 - **Live** : 0 trade clos (4 ouverts, tous `trend_pullback@1` short) → aucune décision de promotion. Aucune nouvelle version (v1 créées aujourd'hui, garde-fou 24 h).
 - **Labo** : piste P1 `failed_breakout` (volume ≥ 1,5 et/ou stop + 0,5 ATR) testée sur 90 j / 25 symboles → rejetée : ces variantes n'améliorent que la 2e moitié (effet de régime probable). La v1 reste stable à +0,08R sur chaque moitié.
 - **Reco** : Analyste → suivre la concentration 100 % short (corrélation). Prochain passage Stratège → filtre de régime BTC 4h (P1).
+
+## 🛠️ Produit · 2026-11-10 13h50 UTC
+- **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
+- **Fait** (1 changement visible) : un bandeau orange « radar en retard, opportunités peut-être périmées » s'affiche au-dessus des cartes dès que le dernier scan date de plus de 30 min (reco Analyste). Correctif d'affichage : « il y a 2 h 0 » devient « il y a 2 h », « 1 h 5 » devient « 1 h 05 ».
+- **Reco** : Analyste → si le bandeau apparaît souvent, c'est que le cron décroche (P1 Fiabilité). Prochain Produit → filtre rapide actif/sens (P2) ou mini-graphique SVG (P2).

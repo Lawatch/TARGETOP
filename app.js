@@ -24,7 +24,7 @@ const sym = (s) => s.replace(/^PF_/, '').replace(/USD$/, '');
 const px = (x) => (x == null || !isFinite(x) ? '–' : x >= 1000 ? x.toLocaleString('fr-FR', { maximumFractionDigits: 1 }) : x >= 1 ? x.toFixed(4).replace(/0+$/, '').replace(/\.$/, '') : x.toPrecision(4));
 const pct = (x, d = 2) => (x == null || !isFinite(x) ? '–' : (x > 0 ? '+' : '') + x.toFixed(d) + ' %');
 const r2 = (x) => (x == null || !isFinite(x) ? '–' : (x > 0 ? '+' : '') + x.toFixed(2) + 'R');
-const ago = (t) => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? "à l'instant" : m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.floor(m / 60)} h ${m % 60}` : `il y a ${Math.floor(m / 1440)} j`; };
+const ago = (t) => { const m = Math.round((Date.now() - t) / 60e3); return m < 1 ? "à l'instant" : m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.floor(m / 60)} h${m % 60 ? ' ' + String(m % 60).padStart(2, '0') : ''}` : `il y a ${Math.floor(m / 1440)} j`; };
 const usd = (x) => (x == null || !isFinite(x) ? '–' : x.toLocaleString('fr-FR', { style: 'currency', currency: 'USD', maximumFractionDigits: x < 100 ? 2 : 0 }));
 const cls = (x) => (x > 0 ? 'pos' : x < 0 ? 'neg' : '');
 
@@ -289,12 +289,17 @@ function renderMarket() {
   $('market').innerHTML = tbl('🚀 Top hausses 24h', m.gainers, ch) + tbl('🩸 Top baisses 24h', m.losers, ch) + tbl('🔥 Funding le plus haut (longs payent)', m.fundingHigh, fu) + tbl('🧊 Funding le plus bas (shorts payent)', m.fundingLow, fu);
 }
 
+const STALE_MS = 30 * 60e3; // au-delà, les données sont considérées en retard
 function renderHeader() {
   const age = Date.now() - state.generatedAt;
   const p = $('pill-scan');
   p.className = 'pill ' + (age < 25 * 60e3 ? 'ok' : age < 90 * 60e3 ? 'warn' : 'bad');
   p.textContent = `Scan ${ago(state.generatedAt)} · ${state.universeSize} actifs`;
   p.title = state.errors?.length ? 'Erreurs : ' + state.errors.join(' | ') : 'Dernier scan sans erreur';
+  // Bandeau explicite si le scan est en retard : les signaux affichés peuvent être périmés.
+  const bn = $('stale-banner');
+  bn.hidden = age < STALE_MS;
+  if (!bn.hidden) bn.textContent = `⚠️ Dernier scan ${ago(state.generatedAt)} (${new Date(state.generatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}) : le radar est en retard, ces opportunités peuvent être périmées. Vérifie le prix sur Kraken avant d'entrer.`;
   const b = live.PF_XBTUSD ?? state.market?.btc?.last;
   $('pill-btc').innerHTML = `BTC ${px(b)} <span class="${cls(state.market?.btc?.change24h)}">${pct(state.market?.btc?.change24h)}</span>`;
 }

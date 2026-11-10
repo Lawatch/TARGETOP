@@ -55,3 +55,5 @@ th{color:var(--muted);font-weight:500;font-size:12px}
 .report{white-space:pre-wrap;font-size:13px;color:#cbd5e1;margin-top:8px;max-height:480px;overflow:auto}
 .empty{color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:10px;padding:16px;text-align:center}
 footer{text-align:center;padding:20px}
+.banner{background:#2a1a05;border:1px solid #78350f;color:#fcd34d;border-radius:10px;padding:10px 14px;margin:0 0 10px;font-weight:600}
+.banner[hidden]{display:none}
