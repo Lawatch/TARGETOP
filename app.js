@@ -7,6 +7,8 @@ const PRESETS = {
   funded: { capital: 5000, risk: 0.5, lev: 1, daily: 0, dd: 5 },
 };
 const LS_KEY = 'targetop.risk.v1';
+const SHOWN = new Set(['live', 'explore']); // statuts affichés dans le radar principal
+const riskMult = (s) => (s.status === 'explore' ? 0.5 : 1); // exploration = demi-risque
 const REFRESH_MS = 60e3;
 const WS_URL = 'wss://futures.kraken.com/ws/v1';
 
@@ -130,7 +132,7 @@ function initAlerts() {
   };
 }
 function notifyNew(first) {
-  const fresh = (state.signals || []).filter((s) => s.status === 'live' && !seenSignals.has(sigKey(s)));
+  const fresh = (state.signals || []).filter((s) => SHOWN.has(s.status) && !seenSignals.has(sigKey(s)));
   fresh.forEach((s) => seenSignals.add(sigKey(s)));
   sessionStorage.setItem('targetop.seen', JSON.stringify([...seenSignals].slice(-300)));
   if (first || !alertsOn || !fresh.length) return;
@@ -148,6 +150,8 @@ const sigKey = (s) => `${s.symbol}|${s.strategy}|${s.barTime}`;
 function reliability(stratId) {
   const s = state?.stats?.byStrategy?.[stratId];
   const n = s?.trades || 0;
+  const st = (state?.strategies || []).find((x) => x.id === stratId)?.status;
+  if (st === 'explore' && n < 30) return { cls: 'warn', txt: `🧪 Exploration : validée en backtest, à confirmer en live (${n}/30) · demi-risque` };
   if (n < 30) return { cls: 'info', txt: `Fiabilité : non prouvée (${n}/30 trades)` };
   if (s.expectancyR >= 0.1 && s.profitFactor >= 1.2) return { cls: 'ok', txt: `Fiable : ${r2(s.expectancyR)}/trade sur ${n}` };
   if (s.expectancyR > 0) return { cls: 'warn', txt: `Fragile : ${r2(s.expectancyR)}/trade sur ${n}` };
@@ -170,12 +174,12 @@ function sizing(s, price) {
   const entry = price || s.entry;
   const dist = Math.abs(entry - s.sl);
   if (!(dist > 0)) return '';
-  const rUsd = risk.capital * risk.risk / 100;
+  const rUsd = risk.capital * risk.risk / 100 * riskMult(s);
   const qty = rUsd / dist;
   const notional = qty * entry;
   const lev = notional / risk.capital;
   const warn = lev > risk.lev ? ` <span class="neg">⚠ levier ${lev.toFixed(1)}x > max ${risk.lev}x : réduis à ${usd(risk.capital * risk.lev)} (risque ${usd(risk.capital * risk.lev / entry * dist)})</span>` : '';
-  return `Taille : <b>${qty >= 100 ? Math.round(qty).toLocaleString('fr-FR') : qty.toPrecision(3)} ${sym(s.symbol)}</b> ≈ ${usd(notional)} (levier ${lev.toFixed(1)}x) · risque ${usd(rUsd)}${warn}`;
+  return `Taille : <b>${qty >= 100 ? Math.round(qty).toLocaleString('fr-FR') : qty.toPrecision(3)} ${sym(s.symbol)}</b> ≈ ${usd(notional)} (levier ${lev.toFixed(1)}x) · risque ${usd(rUsd)}${riskMult(s) < 1 ? ' (½ risque : exploration)' : ''}${warn}`;
 }
 
 function card(s, compact) {
@@ -210,7 +214,7 @@ function card(s, compact) {
 
 function renderSignals() {
   const sigs = state.signals || [];
-  const liveSigs = sigs.filter((s) => s.status === 'live');
+  const liveSigs = sigs.filter((s) => SHOWN.has(s.status));
   const lab = sigs.filter((s) => s.status === 'shadow');
   $('sig-count').textContent = liveSigs.length ? `${liveSigs.length} active(s)` : '';
   $('lab-count').textContent = `(${lab.length})`;
@@ -232,7 +236,7 @@ function tradeR(t) {
 }
 
 function renderOpen() {
-  const ts = (state.openTrades || []).slice().sort((a, b) => (a.status === b.status ? b.openTime - a.openTime : a.status === 'live' ? -1 : 1));
+  const ts = (state.openTrades || []).slice().sort((a, b) => (a.status === b.status ? b.openTime - a.openTime : SHOWN.has(a.status) ? -1 : 1));
   $('open-count').textContent = ts.length ? `(${ts.length})` : '';
   if (!ts.length) { $('open').innerHTML = '<div class="empty">Aucun trade papier ouvert.</div>'; return; }
   $('open').innerHTML = `<div class="tablewrap"><table><thead><tr><th>Actif</th><th>Sens</th><th>Stratégie</th><th>Entrée</th><th>Stop</th><th>TP1</th><th>TP2</th><th>Prix</th><th>R live</th><th>Depuis</th></tr></thead><tbody>${ts.map((t) => {
@@ -241,12 +245,17 @@ function renderOpen() {
   }).join('')}</tbody></table></div>`;
 }
 
+function statusTag(st) {
+  const m = { live: ['ok', 'live'], explore: ['warn', '🧪 exploration'], shadow: ['info', 'labo'], disabled: ['bad', 'arrêtée'] }[st] || ['', st];
+  return `<span class="tag ${m[0]}">${esc(m[1])}</span>`;
+}
+
 function renderPerf() {
   const st = state.stats || {};
   const L = st.live || {};
   const k = (label, v, c = '') => `<div class="kpi"><span>${label}</span><b class="${c}">${v}</b></div>`;
   $('kpis').innerHTML = [
-    k('Trades clôturés (live)', L.trades ?? 0),
+    k('Trades clôturés (radar)', L.trades ?? 0),
     k('Taux de réussite', L.winRate == null ? '–' : Math.round(L.winRate * 100) + ' %'),
     k('Espérance / trade', r2(L.expectancyR), cls(L.expectancyR)),
     k('Total', r2(L.totalR), cls(L.totalR)),
@@ -261,9 +270,9 @@ function renderPerf() {
     const id = key.split('@')[0];
     const meta = strats.find((x) => x.id === id) || {};
     const isCur = meta.version && key.endsWith('@v' + meta.version);
-    return `<tr><td><b>${esc(meta.label || id)}</b> <span class="muted">${esc(key.split('@')[1])}</span></td><td>${isCur ? `<span class="tag ${meta.status === 'live' ? 'ok' : meta.status === 'shadow' ? 'info' : 'bad'}">${esc(meta.status)}</span>` : '<span class="tag">ancienne</span>'}</td><td>${v.trades}</td><td>${v.winRate == null ? '–' : Math.round(v.winRate * 100) + ' %'}</td><td class="${cls(v.expectancyR)}">${r2(v.expectancyR)}</td><td class="${cls(v.totalR)}">${r2(v.totalR)}</td><td>${v.profitFactor ?? '–'}</td><td>${!v.maxDrawdownR ? '0R' : '-' + v.maxDrawdownR.toFixed(2) + 'R'}</td></tr>`;
+    return `<tr><td><b>${esc(meta.label || id)}</b> <span class="muted">${esc(key.split('@')[1])}</span></td><td>${isCur ? `${statusTag(meta.status)}` : '<span class="tag">ancienne</span>'}</td><td>${v.trades}</td><td>${v.winRate == null ? '–' : Math.round(v.winRate * 100) + ' %'}</td><td class="${cls(v.expectancyR)}">${r2(v.expectancyR)}</td><td class="${cls(v.totalR)}">${r2(v.totalR)}</td><td>${v.profitFactor ?? '–'}</td><td>${!v.maxDrawdownR ? '0R' : '-' + v.maxDrawdownR.toFixed(2) + 'R'}</td></tr>`;
   });
-  const noTrades = strats.filter((s) => !Object.keys(byV).some((k2) => k2.startsWith(s.id + '@'))).map((s) => `<tr><td><b>${esc(s.label)}</b> <span class="muted">v${s.version}</span></td><td><span class="tag ${s.status === 'live' ? 'ok' : 'info'}">${esc(s.status)}</span></td><td colspan="6" class="muted">pas encore de trade clôturé</td></tr>`);
+  const noTrades = strats.filter((s) => !Object.keys(byV).some((k2) => k2.startsWith(s.id + '@'))).map((s) => `<tr><td><b>${esc(s.label)}</b> <span class="muted">v${s.version}</span></td><td>${statusTag(s.status)}</td><td colspan="6" class="muted">pas encore de trade clôturé</td></tr>`);
   $('perf').innerHTML = `<div class="tablewrap"><table><thead><tr><th>Stratégie</th><th>Statut</th><th>Trades</th><th>Réussite</th><th>Espérance</th><th>Total</th><th>PF</th><th>DD max</th></tr></thead><tbody>${rows.join('') + noTrades.join('')}</tbody></table></div>`;
   const cl = state.recentClosed || [];
   $('closed').innerHTML = cl.length ? `<div class="tablewrap"><table><thead><tr><th>Clôture</th><th>Actif</th><th>Sens</th><th>Stratégie</th><th>Sortie</th><th>Résultat</th></tr></thead><tbody>${cl.map((t) => `<tr><td>${ago(t.closeTime)}</td><td><b>${esc(sym(t.symbol))}</b></td><td><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td>${esc(t.strategy)}@v${t.version}${t.status === 'shadow' ? ' <span class="tag">labo</span>' : ''}</td><td>${esc(t.exitReason)}</td><td class="${cls(t.resultR)}"><b>${r2(t.resultR)}</b></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Pas encore de trade clôturé.</div>';
