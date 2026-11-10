@@ -56,3 +56,18 @@ Lecture :
 - `breakout_volume` (shadow) : négatif dans presque tous les régimes (−0,15R puis −0,33R par moitié). Candidat à `disabled`.
 
 Décision : **rien ne change aujourd'hui**, car `trend_pullback` v1 date du 10/11 (garde-fou de 24 h). Prochaine étape, à partir du 11/11 : implémenter le filtre BTC 4h dans `src/core`, avec un test, puis refaire un backtest réel (et non a posteriori) avant toute v2.
+
+## 2026-11-10 (après-midi) — Accélération avant le lancement du 1/12
+
+Tests demandés (le boss trouve que ça ne va pas assez vite) :
+- 15m (court terme), 90 j/25 : `failed_breakout` −0,25R, `trend_pullback` −0,17R → **rejeté** (frais). Sans frais : −0,04R / +0,02R.
+- 50 symboles, 90 j : ≈ +0,01R pour les deux → **rejeté pour le live**, gardé pour le labo.
+- 180 j / 25 : `failed_breakout` 0,00R (−0,14 / +0,14), `trend_pullback` −0,06R → l'avantage observé sur 90 j **n'est pas robuste**.
+- Filtre de régime « dans le sens de la tendance 4h » sur `failed_breakout`, 180 j/25 : **+0,09R, PF 1,16** (−0,04 / +0,21).
+- Frais 0, 1h, 90 j/25 : `failed_breakout` +0,23R (PF 1,47), `trend_pullback` +0,12R → la structure de frais du challenge est décisive.
+
+Décisions :
+- Ajout du filtre générique `params.regime` (`with` / `against`), testé.
+- Nouvelles variantes **shadow** : `failed_breakout_regime` (filtre tendance) et `failed_breakout_quick` (TP 1R/2R, 24 h).
+- Univers : 50 perps scannés (labo), live limité au top 25.
+- Les 2 stratégies live restent live (exception de démarrage), badge « non prouvée ».
