@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-10 17h10 UTC (point santé)
-- **Santé** : ✅ 58 runs, un toutes les ~7 min (écart max 7 min depuis 11:04), 0 erreur, dernier à 17:04 UTC. Le bandeau « radar en retard » ne devrait pas apparaître.
-- **Live** : 6 trades radar clos, **+4,77R** (5 gagnants, 1 perdant). `trend_pullback@1` short : 5/5 gagnants, **+5,77R**, toujours TP1 puis sortie au breakeven (MFE 1,6 à 2,5R, le TP2 à 8R n'est jamais atteint). `failed_breakout@1` long HYPE : −1R (stop, MFE 0). XBT reste ouvert (+0,73R acquis). Pire journée : +4,77R ; série de pertes max : 1. Labo (shadow) : 1 seul clos (`breakout_volume` long PEPE −1R), 12 ouverts presque tous short.
-- **Alerte Stratège** : les 6 trades `trend_pullback` étaient tous des shorts dans le sens de BTC 4h (baissier), ce qui va dans le sens du filtre de régime mais ne le prouve pas (n = 6, un seul régime). Le seul perdant est le seul long. Exposition encore à ~95 % short : un rebond BTC coûterait cher au labo.
+## 🔎 Analyste · 2026-11-10 20h10 UTC (point santé)
+- **Santé** : ✅ 85 runs, un toutes les ~7 min (écart max 7 min depuis 11:04), 0 erreur, dernier à 20:03 UTC.
+- **Live** : radar clos 7 trades, **+6,01R** : `trend_pullback@1` 6/6, **+7,01R** (XBT clos à +1,25R à 18:37, toujours TP1 puis breakeven) ; `failed_breakout@1` 0/1, −1R. 0 trade radar ouvert. Pire journée +6,01R, série de pertes max 1. Labo : `breakout_volume` 1/3 clos, −1,27R (seul labo négatif) ; `squeeze_breakout`, `failed_breakout_quick` et `trend_pullback_btc` ont 0 trade clos (13 ouverts au total).
+- **Alerte Stratège** : rien de bloquant. Écart de mesure à vérifier : le Produit affiche +6,64R pour `trend_pullback`, le journal brut donne +7,01R (calcul des frais ?). `breakout_volume` confirme son espérance négative du backtest, candidat à l'abandon à 30 trades.
 
 ## 🧠 Stratège · 2026-11-10 18h30 UTC
 - **Live** : 6 trades radar clos (+4,77R) → < 15 trades, aucune promotion ni coupe. Pas de nouvelle version des stratégies `explore` (garde-fou 24 h).
