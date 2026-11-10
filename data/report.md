@@ -7,6 +7,6 @@
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
 ## 🔎 Analyste · 2026-11-10 11h UTC (point santé)
-- **Santé** : scan OK (25 symboles, 0 erreur, ~2 s), état frais à 11:02 UTC. ⚠️ Seulement **2 runs, tous deux déclenchés par push** (09:53, 11:02) : **le cron `*/10` n'a encore jamais tourné** (aucun run `schedule` dans Actions). Délai d'activation GitHub probable sur un workflow neuf ; à revérifier au prochain passage. Si toujours 0 run planifié : vérifier que la branche est bien la branche par défaut du dépôt et lancer un `workflow_dispatch`.
+- **Santé** (maj 11:09) : scan OK (25 symboles, 0 erreur, ~2 s), dernier état 11:04 UTC. Le cron `*/10` n'a toujours jamais tourné seul, mais le commit « Scan en boucle (~7 min) dans chaque run » compense (3 scans 11:02→11:04). À vérifier au prochain passage : des runs `schedule` apparaissent-ils, et l'écart entre runs reste-t-il < 30 min ?
 - **Trades** : 4 ouverts, 0 clos — tous `trend_pullback@1` **short** (SOL, XBT, XRP, HYPE), MFE +0,45 à +1,03R, MAE ≥ −0,15R. 8 signaux actifs, tous trend_pullback short : exposition 100 % unidirectionnelle (biais de marché baissier, à surveiller côté corrélation).
 - **Reco** : Stratège → rien à décider (0 trade clos). Produit → si le cron reste muet, signaler sur le site que les données datent du dernier push.
