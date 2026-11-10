@@ -45,6 +45,31 @@
       }
     },
     {
+      "id": "trend_pullback_btc",
+      "label": "Pullback de tendance (dans le sens de BTC)",
+      "detector": "trend_pullback",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "minAdx1h": 20,
+        "pullbackBars": 6,
+        "touchAtr": 0.15,
+        "rsiMin": 48,
+        "rsiMax": 68,
+        "maxExtAtr": 2.5,
+        "slBufferAtr": 0.25,
+        "minRiskAtr": 0.8,
+        "maxRiskAtr": 2.5,
+        "tp1R": 1.5,
+        "tp2R": 8,
+        "maxHoldHours": 72,
+        "tf": "1h",
+        "trailAtr": 2,
+        "require4h": false,
+        "btcRegime": "with"
+      }
+    },
+    {
       "id": "failed_breakout_regime",
       "label": "Faux breakout + filtre tendance de fond",
       "detector": "failed_breakout",

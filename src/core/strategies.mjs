@@ -253,6 +253,15 @@ export function runStrategy(strat, ctx, meta = {}) {
     const withTrend = (raw.side === 'long') === up;
     if ((strat.params.regime === 'with') !== withTrend) return null;
   }
+  // Filtre de régime BTC générique : params.btcRegime = "with" (dans le sens de la tendance BTC 4h, EMA20/EMA50)
+  // ou "against". Sans série BTC disponible, le signal est refusé (prudence).
+  if (strat.params.btcRegime) {
+    const { btc4h, kb } = ctx;
+    if (!btc4h || kb == null || kb < 50 || !ok(btc4h.ema20[kb]) || !ok(btc4h.ema50[kb])) return null;
+    const up = btc4h.ema20[kb] > btc4h.ema50[kb];
+    const withBtc = (raw.side === 'long') === up;
+    if ((strat.params.btcRegime === 'with') !== withBtc) return null;
+  }
   const risk = Math.abs(raw.entry - raw.sl);
   if (!(risk > 0)) return null;
   const dir = raw.side === 'long' ? 1 : -1;

@@ -137,3 +137,27 @@ test('filtre de régime : "with" ne garde que les signaux dans le sens de la ten
   assert.ok(runStrategy(mk('short', undefined), ctx));
   delete DETECTORS.__fake;
 });
+
+test('filtre de régime BTC : "with" ne garde que les signaux dans le sens de BTC 4h, refusé sans série BTC', async () => {
+  const { DETECTORS, runStrategy } = await import('../src/core/strategies.mjs');
+  DETECTORS.__fakeBtc = (ctx, p) => ({ side: p.side, entry: 100, sl: p.side === 'long' ? 99 : 101, quality: 0.5, reasons: [] });
+  const btc4h = { ema20: Array(60).fill(90), ema50: Array(60).fill(100) }; // BTC 4h baissier
+  const ctx = { s15: { atr14: [1] }, i: 0, btc4h, kb: 59 };
+  const mk = (side, btcRegime) => ({ id: 'x', detector: '__fakeBtc', version: 1, status: 'shadow', params: { side, btcRegime, tp1R: 1, tp2R: 2 } });
+  assert.ok(runStrategy(mk('short', 'with'), ctx));
+  assert.equal(runStrategy(mk('long', 'with'), ctx), null);
+  assert.ok(runStrategy(mk('long', 'against'), ctx));
+  assert.ok(runStrategy(mk('long', undefined), ctx));
+  assert.equal(runStrategy(mk('short', 'with'), { ...ctx, btc4h: null, kb: -1 }), null);
+  delete DETECTORS.__fakeBtc;
+});
+
+test('evaluateAt transmet la série BTC 4h sans regarder le futur', async () => {
+  const { prepareBtc4h, MS4H } = await import('../src/core/engine.mjs');
+  const H = 3600e3;
+  const c1h = Array.from({ length: 400 }, (_, i) => C(i * H, 100, 101, 99, 100));
+  const b = prepareBtc4h(c1h);
+  assert.equal(b.candles.length, 100);
+  const { lastClosedIndex } = await import('../src/core/series.mjs');
+  assert.equal(lastClosedIndex(b, 8 * H, MS4H), 1); // à 8 h, seules les bougies 4h de 0 h et 4 h sont closes
+});

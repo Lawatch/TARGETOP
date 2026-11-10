@@ -9,6 +9,11 @@ import { runStrategy } from './strategies.mjs';
 export const MS15 = 900e3, MS1H = 3600e3, MS4H = 14400e3;
 const TFMS = { '15m': MS15, '1h': MS1H, '4h': MS4H };
 
+// Série 4h de BTC (pour params.btcRegime), construite à partir des bougies 1h de PF_XBTUSD.
+export function prepareBtc4h(c1h) {
+  return c1h && c1h.length ? buildSeries(resample(c1h, MS4H)) : null;
+}
+
 export function prepareSymbol(c15, c1h) {
   return { '15m': buildSeries(c15), '1h': buildSeries(c1h), '4h': buildSeries(resample(c1h, MS4H)) };
 }
@@ -32,6 +37,8 @@ export function evaluateAt(prep, t, strategies, meta = {}, mode = 'live') {
       s4h: prep[h2], k: lastClosedIndex(prep[h2], closeT, TFMS[h2]),
       funding: meta.funding,
       tfb: b, tfh: h,
+      // Régime BTC (optionnel) : série 4h de PF_XBTUSD et index de sa dernière bougie clôturée
+      btc4h: meta.btc4h, kb: meta.btc4h ? lastClosedIndex(meta.btc4h, closeT, MS4H) : -1,
     };
     if (ctx.j < 0) continue;
     const sig = runStrategy(st, ctx, meta);

@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fetchTickers, fetchCandles, mapLimit, TF_MS } from './kraken.mjs';
-import { prepareSymbol, evaluateAt, MS15 } from './core/engine.mjs';
+import { prepareSymbol, prepareBtc4h, evaluateAt, MS15 } from './core/engine.mjs';
 import { openTrade, updateTrade } from './core/trade.mjs';
 import { computeStats, groupStats } from './core/stats.mjs';
 
@@ -46,6 +46,8 @@ const warm = 250;
 const from15 = now - (days * 96 + warm) * MS15;
 const from1h = now - (days * 24 + warm) * 3600e3;
 
+const btc4h = prepareBtc4h(await cached('PF_XBTUSD', '1h', from1h)); // filtre params.btcRegime
+
 const trades = [];
 const res = await mapLimit(syms, 4, async (t) => {
   const c15 = await cached(t.symbol, '15m', from15);
@@ -61,7 +63,7 @@ const res = await mapLimit(syms, 4, async (t) => {
       updateTrade(tr, [bar], MS15);
       if (tr.state === 'closed') { trades.push(tr); lastCloseBy[k] = tr.closeTime; delete openBy[k]; }
     }
-    const sigs = evaluateAt(prep, c15[i].t + MS15, strategies, { volumeQuote: t.volumeQuote }, 'replay');
+    const sigs = evaluateAt(prep, c15[i].t + MS15, strategies, { volumeQuote: t.volumeQuote, btc4h }, 'replay');
     for (const s of sigs) {
       const st = strategies.find((x) => x.id === s.strategy);
       if (st.status === 'live' && s.score < settings.minScoreLive) continue;

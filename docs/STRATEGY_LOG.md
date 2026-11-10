@@ -80,3 +80,25 @@ Décision utilisateur : accepter un peu de risque pour découvrir plus vite. Nou
 - `donchian_trend` (long seulement, 1h, stop 2,5 ATR, suiveur 3 ATR après TP1 2R) — 180 j / 25 cryptos : **+0,14R, PF 1,23** (−0,01 / +0,25) → **`explore`**.
 - `trend_pullback` (−0,06R) et `failed_breakout` (−0,05R) sur 180 j / 25 cryptos : **`live` → `explore`** (demi-risque). Aucune stratégie n'est `live` tant qu'elle n'a pas prouvé un avantage en réel. Coupe automatique si < −0,20R après 15 trades.
 - Ajout des filtres génériques `params.sides` (long/short) et `params.regime` (with/against).
+
+## 2026-11-10 18h30 — Stratège : filtre de régime BTC 4h (`params.btcRegime`) + variante shadow `trend_pullback_btc`
+
+Live : 6 trades radar clos (+4,77R), dont `trend_pullback@1` 5/5 gagnants, tous des shorts dans le sens de BTC 4h → < 15 trades, aucune décision de cycle de vie.
+
+Constats (180 j / 25 cryptos, standard du sprint) :
+- Le filtre existant `regime: "with"` (tendance 4h **du symbole**) ne change **rien** pour `trend_pullback` en 1h (résultats identiques) : le détecteur exige déjà EMA20 > EMA50 sur son TF supérieur (4h).
+- Classement des trades `trend_pullback` selon la tendance **BTC** 4h : les trades contre BTC perdent **dans les 4 trimestres** (−0,15 / −0,19 / −0,22 / −0,20R, n = 335). C'est le signal le plus stable trouvé jusqu'ici.
+- Nouveau filtre générique `params.btcRegime` (`with` / `against`, tendance EMA20/EMA50 de PF_XBTUSD en 4h, sans biais d'anticipation, testé). Vrai backtest :
+
+| Stratégie | Variante | Trades | Exp. | PF | Max DD | 1re moitié | 2e moitié |
+|---|---|---|---|---|---|---|---|
+| `trend_pullback` | v1 | 1836 | −0,05R | 0,92 | 203R | −0,14R | +0,05R |
+| `trend_pullback` | + `btcRegime: with` | 1527 | −0,02R | 0,97 | 156R | −0,13R | +0,09R |
+| `failed_breakout` | v1 | 1173 | −0,05R | 0,92 | 146R | −0,20R | +0,10R |
+| `failed_breakout` | + `btcRegime: with` | 524 | +0,04R | 1,07 | 53R | −0,04R | +0,14R |
+
+Décisions :
+- Ajout de **`trend_pullback_btc` en `shadow`** (mêmes paramètres que `trend_pullback` v1 + `btcRegime: "with"`). Le filtre améliore les deux moitiés mais reste sous les critères `explore` : à prouver en labo.
+- `failed_breakout` + filtre BTC : nette baisse du drawdown (146R → 53R) mais 1re moitié encore négative, et le labo a déjà `failed_breakout_regime` (tendance du symbole, +0,09R). Pas de variante en plus (labo à 11 actives).
+- Rien ne change pour les stratégies `explore` (garde-fou 24 h et données live insuffisantes).
+- Lecture honnête : sur 180 j, aucune variante de ces deux familles n'atteint +0,08R. Le filtre BTC réduit les pertes, il ne crée pas d'avantage.
