@@ -161,3 +161,20 @@ test('evaluateAt transmet la série BTC 4h sans regarder le futur', async () => 
   const { lastClosedIndex } = await import('../src/core/series.mjs');
   assert.equal(lastClosedIndex(b, 8 * H, MS4H), 1); // à 8 h, seules les bougies 4h de 0 h et 4 h sont closes
 });
+
+test('filtre de volatilité BTC : btcVolMinPct ignore les périodes calmes', async () => {
+  const { DETECTORS, runStrategy, btcVolPct } = await import('../src/core/strategies.mjs');
+  DETECTORS.__fakeVol = () => ({ side: 'long', entry: 100, sl: 99, quality: 0.5, reasons: [] });
+  const close = Array(200).fill(100);
+  const calm = { close, atr14: Array.from({ length: 200 }, (_, i) => (i === 150 ? 0.5 : 1 + (i % 10) / 10)) };
+  const hot = { close, atr14: Array.from({ length: 200 }, (_, i) => (i === 150 ? 5 : 1 + (i % 10) / 10)) };
+  assert.equal(btcVolPct(calm, 150), 0);
+  assert.equal(btcVolPct(hot, 150), 1);
+  assert.equal(btcVolPct(hot, 50), null); // pas assez d'historique
+  const st = { id: 'x', detector: '__fakeVol', version: 1, status: 'shadow', params: { btcVolMinPct: 0.33, tp1R: 1, tp2R: 2 } };
+  const base = { s15: { atr14: [1] }, i: 0, kb: 150 };
+  assert.equal(runStrategy(st, { ...base, btc4h: calm }), null);
+  assert.ok(runStrategy(st, { ...base, btc4h: hot }));
+  assert.equal(runStrategy(st, { ...base, btc4h: null }), null);
+  delete DETECTORS.__fakeVol;
+});

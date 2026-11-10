@@ -5,8 +5,8 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 ## Stratégie
 - [ ] P0 Intégrer les frais réels du challenge dans `config/settings.json` (`feePctPerSide`) dès qu'ils sont confirmés, et refaire les backtests de référence.
 - [ ] P1 Décliner le filtre `regime: "with"` sur `trend_pullback` / autres idées en variantes shadow (180 j / 25).
-- [x] P1 Filtre de régime BTC (tendance) → `params.btcRegime`. Reste à tester : volatilité BTC (ATR 4h élevé = couper les stratégies de retour à la moyenne ?).
-- [x] P1 Filtre de régime BTC 4h : `params.btcRegime` implémenté et testé (voir STRATEGY_LOG 10/11 18h30), variante shadow `trend_pullback_btc` ajoutée.
+- [x] P1 Filtre de régime BTC : tendance → `params.btcRegime` (variante `trend_pullback_btc`) ; volatilité → `params.btcVolMinPct` (variante `donchian_trend_vol`).
+- [ ] P1 ≥ 11/11 21h : si `donchian_trend_vol` ne dément pas en labo, `donchian_trend` v2 avec `btcVolMinPct: 0.33` (backtest 180 j : +0,16R → +0,31R).
 - [ ] P2 `breakout_volume` (shadow) : négatif dans tous les régimes en backtest (−0,15R / −0,33R par moitié) → envisager `disabled` pour alléger le site.
 - [x] P1 `failed_breakout` : volume plus strict / stop mèche + 0,5 ATR → testé le 10/11, rejeté (incohérent entre les 2 moitiés, voir STRATEGY_LOG). Si on y revient, ce sera via le filtre de régime.
 - [ ] P2 Ajouter l'historique de funding (endpoint `historicalfundingrates`) au backtest pour évaluer `funding_squeeze`.

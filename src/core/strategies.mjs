@@ -237,6 +237,20 @@ export const DETECTORS = {
 };
 
 // Lance une stratégie et complète le signal (TP, R:R, score).
+// Rang centile (0..1) de l'ATR 4h relatif de BTC à l'index kb parmi les `look` bougies précédentes. null si indisponible.
+export function btcVolPct(btc4h, kb, look = 120) {
+  if (!btc4h || kb == null || kb < look || !btc4h.atr14 || !btc4h.close) return null;
+  const v = btc4h.atr14[kb] / btc4h.close[kb];
+  if (!ok(v)) return null;
+  let below = 0, n = 0;
+  for (let x = kb - look; x < kb; x++) {
+    const h = btc4h.atr14[x] / btc4h.close[x];
+    if (!ok(h)) continue;
+    n++; if (h < v) below++;
+  }
+  return n >= look / 2 ? below / n : null;
+}
+
 export function runStrategy(strat, ctx, meta = {}) {
   const fn = DETECTORS[strat.detector];
   if (!fn) return null;
@@ -261,6 +275,12 @@ export function runStrategy(strat, ctx, meta = {}) {
     const up = btc4h.ema20[kb] > btc4h.ema50[kb];
     const withBtc = (raw.side === 'long') === up;
     if ((strat.params.btcRegime === 'with') !== withBtc) return null;
+  }
+  // Filtre de volatilité BTC générique : params.btcVolMinPct (0..1) = rang centile minimal de l'ATR 4h relatif de BTC
+  // (ATR14/clôture) parmi ses 120 dernières bougies 4h (~20 j). Ex. 0.33 = on ignore le tiers le plus calme.
+  if (strat.params.btcVolMinPct != null) {
+    const pct = btcVolPct(ctx.btc4h, ctx.kb);
+    if (pct == null || pct < strat.params.btcVolMinPct) return null;
   }
   const risk = Math.abs(raw.entry - raw.sl);
   if (!(risk > 0)) return null;

@@ -210,6 +210,23 @@
         "maxHoldHours": 240,
         "sides": "long"
       }
+    },
+    {
+      "id": "donchian_trend_vol",
+      "label": "Suivi de tendance (canal, long) (BTC agité)",
+      "detector": "donchian_trend",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "tf": "1h",
+        "riskAtr": 2.5,
+        "tp1R": 2,
+        "tp2R": 12,
+        "trailAtr": 3,
+        "maxHoldHours": 240,
+        "sides": "long",
+        "btcVolMinPct": 0.33
+      }
     }
   ]
 }

@@ -102,3 +102,29 @@ Décisions :
 - `failed_breakout` + filtre BTC : nette baisse du drawdown (146R → 53R) mais 1re moitié encore négative, et le labo a déjà `failed_breakout_regime` (tendance du symbole, +0,09R). Pas de variante en plus (labo à 11 actives).
 - Rien ne change pour les stratégies `explore` (garde-fou 24 h et données live insuffisantes).
 - Lecture honnête : sur 180 j, aucune variante de ces deux familles n'atteint +0,08R. Le filtre BTC réduit les pertes, il ne crée pas d'avantage.
+
+## 2026-11-10 21h30 — Stratège : filtre de volatilité BTC (`params.btcVolMinPct`) + variante shadow `donchian_trend_vol`
+
+Live : radar 7 trades clos (+6,64R net de frais), labo < 15 trades par stratégie → aucune décision de cycle de vie.
+Mesure : l'écart +7,01R / +6,64R vient de `realizedR` (brut) vs `resultR` (**net de frais**, le bon chiffre).
+
+Analyse (180 j / 25 cryptos, tous les trades classés selon le rang centile de l'ATR 4h relatif de BTC sur ~20 j) :
+
+| Stratégie | BTC calme (< 33 %) | moyen | agité (≥ 67 %) |
+|---|---|---|---|
+| `donchian_trend` | −0,15R (−0,14 / −0,17) | +0,14R (+0,05 / +0,20) | **+0,54R** (+0,11 / +0,64) |
+| `trend_pullback` | −0,15R (−0,30 / +0,04) | −0,09R | +0,06R (+0,02 / +0,10) |
+| `failed_breakout` | −0,04R | −0,04R | −0,06R (aucun lien) |
+| `rsi2_pullback` | −0,07R | −0,08R | −0,03R (aucun lien) |
+
+→ Le suivi de tendance a besoin de volatilité : en marché calme, ses cassures échouent (logique et stable sur les 2 moitiés). Les stratégies de retournement n'y sont pas sensibles.
+
+Nouveau filtre générique `params.btcVolMinPct` (testé). Vrai backtest `donchian_trend` :
+
+| Variante | Trades | Exp. | PF | Max DD | 1re moitié | 2e moitié |
+|---|---|---|---|---|---|---|
+| v1 | 520 | +0,16R | 1,25 | 39,7R | +0,02R | +0,25R |
+| + `btcVolMinPct: 0.33` | 332 | **+0,31R** | 1,55 | 26,3R | +0,06R | +0,43R |
+| + `btcVolMinPct: 0.5` (pour info) | 246 | +0,38R | 1,70 | 31,1R | +0,21R | +0,43R |
+
+Décision : **`donchian_trend_vol` en `shadow`** (v1 + `btcVolMinPct: 0.33`, seuil « naturel », sans chercher l'optimum à 0,5). `donchian_trend` v1 (`explore`) date d'aujourd'hui : pas de v2 avant le 11/11 21h. Si le labo confirme, la v2 sera candidate. Réserve : la 1re moitié ne compte que 108 trades, et `donchian_trend` est long seulement (biais de marché haussier possible).
