@@ -6,10 +6,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-10 11h UTC (point santé)
-- **Santé** (maj 11:09) : scan OK (25 symboles, 0 erreur, ~2 s), dernier état 11:04 UTC. Le cron `*/10` n'a toujours jamais tourné seul, mais le commit « Scan en boucle (~7 min) dans chaque run » compense (3 scans 11:02→11:04). À vérifier au prochain passage : des runs `schedule` apparaissent-ils, et l'écart entre runs reste-t-il < 30 min ?
-- **Trades** : 4 ouverts, 0 clos — tous `trend_pullback@1` **short** (SOL, XBT, XRP, HYPE), MFE +0,45 à +1,03R, MAE ≥ −0,15R. 8 signaux actifs, tous trend_pullback short : exposition 100 % unidirectionnelle (biais de marché baissier, à surveiller côté corrélation).
-- **Reco** : Stratège → rien à décider (0 trade clos). Produit → si le cron reste muet, signaler sur le site que les données datent du dernier push.
+## 🔎 Analyste · 2026-11-10 14h10 UTC (point santé)
+- **Santé** : ✅ scan régulier : 32 runs, un toutes les ~7 min depuis 11:04 (aucun trou > 7 min), 0 erreur, dernier à 14:11 UTC. Le problème de cadence de 11 h est réglé.
+- **Live** : 2 premiers trades clos, tous deux gagnants : `trend_pullback@1` short SOL **+1,39R** et XRP **+1,17R** (TP1 atteint, puis sortie au breakeven), soit **+2,56R** au total, 0 perte. 4 trades ouverts (XBT, HYPE avec TP1 déjà touché, ADA, DOGE). MAE max −0,32R.
+- **Alerte Stratège** : 6/6 trades sont du `trend_pullback` short. Le risque est corrélé : un rebond BTC toucherait les 4 positions ouvertes en même temps (pire cas ≈ −3R sur la journée, sous la limite de 6R). 2 trades seulement : statistiquement non significatif, aucune décision possible.
 
 ## 🧠 Stratège · 2026-11-10 12h30 UTC
 - **Live** : 0 trade clos (4 ouverts, tous `trend_pullback@1` short) → aucune décision de promotion. Aucune nouvelle version (v1 créées aujourd'hui, garde-fou 24 h).
