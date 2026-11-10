@@ -10,7 +10,7 @@ depuis un PC pro verrouillé, sans rien installer.
 |---|---|
 | `src/core/*.mjs` | Moteur pur et testé : indicateurs, stratégies, paper-trading, stats. Partagé par le scan live et le backtest. |
 | `config/strategies.json` | Stratégies, paramètres, **version** et **statut** (`live` / `shadow` / `disabled`). |
-| `config/settings.json` | Univers (top 25 perps par volume), score min, frais, validité des signaux. |
+| `config/settings.json` | Univers (50 perps scannés pour le labo, top 25 seulement pour le live), score min, frais, validité des signaux. |
 | `src/scan.mjs` | Scan live (GitHub Actions toutes les ~7 min) : détecte, ouvre/suit/clôture les trades papier, écrit `data/*.json`. |
 | `src/backtest.mjs` | Backtest walk-forward sur l'historique Kraken (`--days --symbols --strategies --override --split`). |
 | `web/` | Front-end sans dépendance (HTML/CSS/JS). Prix live via WebSocket Kraken si le réseau le permet. |
@@ -25,10 +25,21 @@ Commandes (Node ≥ 22, aucune dépendance) — l'environnement cloud passe par 
 ```bash
 export NODE_USE_ENV_PROXY=1 NODE_NO_WARNINGS=1   # obligatoire dans les sessions Claude cloud
 npm test                                          # tests du moteur (doivent rester verts)
-node src/backtest.mjs --days 90 --symbols 25 --split
+node src/backtest.mjs --days 180 --symbols 25 --split   # options : --override '{...}' --fee 0 --strategies a,b
 node src/scan.mjs --data ./site/data && node src/build-site.mjs ./site && node src/serve.mjs ./site 8080
 git fetch origin gh-pages && git show origin/gh-pages:data/journal.json > /tmp/journal.json   # résultats live
 ```
+
+## 🚀 Sprint jusqu'au lancement du 1er décembre
+
+Lire `docs/LAUNCH_PLAN.md` (jalons, critères GO). Pendant le sprint :
+- **Standard de backtest : `--days 180 --symbols 25 --split`** (positif sur les 2 moitiés) avant tout passage en live.
+- Le Stratège peut ajouter **jusqu'à 2 variantes `shadow` par passage** (le labo ne coûte rien et accélère l'apprentissage),
+  en gardant le garde-fou d'1 nouvelle version par stratégie *live* par 24 h. Limiter le labo à ~10 stratégies actives :
+  désactiver (`disabled`) les variantes clairement perdantes après 30 trades.
+- **Ce qu'on ne fait pas** sous prétexte d'aller vite : passer du live en 15m/5m (les frais détruisent l'avantage, testé),
+  élargir le live aux alts peu liquides (testé : l'avantage disparaît), assouplir les critères GO.
+- L'Analyste suit les jalons du plan et signale tout retard dans `reports/LATEST.md`.
 
 ## Rotation des experts (un passage par heure)
 

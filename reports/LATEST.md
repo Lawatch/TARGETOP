@@ -1,5 +1,11 @@
 # Rapport des agents
 
+## 🚀 Sprint lancement 1er décembre (10/11 après-midi)
+- Objectif inchangé : du profit. On accélère **l'apprentissage**, pas le risque. Plan et critères GO : `docs/LAUNCH_PLAN.md`.
+- Testé et rejeté : passer en 15m (frais : −0,25R/trade), élargir le live aux petites alts (≈ 0R).
+- Mis en place : labo élargi à 50 cryptos, variantes testées en parallèle, backtests sur 180 jours.
+- ⚠️ Lecture honnête : sur 180 jours, aucune stratégie n'a encore d'avantage solide **avec frais**. Sans frais, l'avantage devient net : il faut confirmer les frais du challenge.
+
 ## 2026-11-10 · Mise en place (session initiale)
 - Radar en ligne : scan des 25 perpétuels les plus liquides de Kraken Futures toutes les ~10 min, signaux long/short avec entrée, stop, TP1, TP2 et taille de position selon ton compte challenge.
 - Chaque signal est paper-tradé automatiquement (frais et slippage inclus) : la section Performance mesure la fiabilité **réelle**.

@@ -1,18 +1,20 @@
 {
   "universe": {
     "minVolumeQuoteUsd": 750000,
-    "maxSymbols": 25,
+    "maxSymbols": 50,
     "always": [
       "PF_XBTUSD",
       "PF_ETHUSD",
       "PF_SOLUSD"
-    ]
+    ],
+    "liveMaxSymbols": 25,
+    "_doc": "maxSymbols = univers scanné (le labo/shadow collecte des données sur tout). liveMaxSymbols = seuls les N plus liquides peuvent produire des signaux live (les alts peu liquides dégradent les résultats en backtest)."
   },
   "minScoreLive": 55,
   "feePctPerSide": 0.05,
   "slippagePctPerSide": 0.02,
   "cooldownBarsAfterClose": 4,
-  "maxOpenTradesPerStrategy": 8,
+  "maxOpenTradesPerStrategy": 12,
   "signalValidityMinutes": {
     "15m": 45,
     "1h": 100

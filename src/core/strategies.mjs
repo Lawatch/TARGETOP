@@ -188,6 +188,15 @@ export function runStrategy(strat, ctx, meta = {}) {
   if (!fn) return null;
   const raw = fn(ctx, strat.params);
   if (!raw) return null;
+  // Filtre de régime générique : params.regime = "with" (dans le sens de la tendance de fond EMA20/EMA50 du TF supérieur)
+  // ou "against" (contre). Absent = pas de filtre.
+  if (strat.params.regime) {
+    const { s4h, k } = ctx;
+    if (!s4h || k == null || k < 50 || !ok(s4h.ema20[k]) || !ok(s4h.ema50[k])) return null;
+    const up = s4h.ema20[k] > s4h.ema50[k];
+    const withTrend = (raw.side === 'long') === up;
+    if ((strat.params.regime === 'with') !== withTrend) return null;
+  }
   const risk = Math.abs(raw.entry - raw.sl);
   if (!(risk > 0)) return null;
   const dir = raw.side === 'long' ? 1 : -1;

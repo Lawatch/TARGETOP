@@ -19,6 +19,9 @@ const cfgPath = arg('--config', path.join(root, 'config/strategies.json'));
 const override = JSON.parse(arg('--override', '{}'));
 const split = argv.includes('--split'); // affiche aussi 1re moitié / 2e moitié (stabilité)
 const settings = JSON.parse(fs.readFileSync(path.join(root, 'config/settings.json'), 'utf8'));
+// --fee / --slip : frais et slippage en % par côté (ex: --fee 0 pour un compte sans frais)
+if (argv.includes('--fee')) settings.feePctPerSide = +arg('--fee');
+if (argv.includes('--slip')) settings.slippagePctPerSide = +arg('--slip');
 let strategies = JSON.parse(fs.readFileSync(cfgPath, 'utf8')).strategies.filter((s) => s.status !== 'disabled' && s.detector !== 'funding_squeeze');
 const only = arg('--strategies', null);
 if (only) strategies = strategies.filter((s) => only.split(',').includes(s.id));

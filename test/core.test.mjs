@@ -124,3 +124,16 @@ test('toutes les stratégies de la config tournent sans erreur sur données synt
     assert.ok(s.params.tp2R >= s.params.tp1R, s.id);
   }
 });
+
+test('filtre de régime : "with" ne garde que les signaux dans le sens de la tendance de fond', async () => {
+  const { DETECTORS, runStrategy } = await import('../src/core/strategies.mjs');
+  DETECTORS.__fake = (ctx, p) => ({ side: p.side, entry: 100, sl: p.side === 'long' ? 99 : 101, quality: 0.5, reasons: [] });
+  const s4h = { ema20: Array(60).fill(110), ema50: Array(60).fill(100) }; // tendance de fond haussière
+  const ctx = { s15: { atr14: [1] }, i: 0, s4h, k: 59 };
+  const mk = (side, regime) => ({ id: 'x', detector: '__fake', version: 1, status: 'shadow', params: { side, regime, tp1R: 1, tp2R: 2 } });
+  assert.ok(runStrategy(mk('long', 'with'), ctx));
+  assert.equal(runStrategy(mk('short', 'with'), ctx), null);
+  assert.ok(runStrategy(mk('short', 'against'), ctx));
+  assert.ok(runStrategy(mk('short', undefined), ctx));
+  delete DETECTORS.__fake;
+});

@@ -45,6 +45,45 @@
       }
     },
     {
+      "id": "failed_breakout_regime",
+      "label": "Faux breakout + filtre tendance de fond",
+      "detector": "failed_breakout",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "tf": "1h",
+        "minVolRatio": 1.2,
+        "minReject": 0.6,
+        "minPokeAtr": 0.1,
+        "slBufferAtr": 0.2,
+        "maxRiskAtr": 2.0,
+        "tp1R": 1.5,
+        "tp2R": 3,
+        "trailAtr": 0,
+        "maxHoldHours": 36,
+        "regime": "with"
+      }
+    },
+    {
+      "id": "failed_breakout_quick",
+      "label": "Faux breakout (sorties rapides)",
+      "detector": "failed_breakout",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "tf": "1h",
+        "minVolRatio": 1.2,
+        "minReject": 0.6,
+        "minPokeAtr": 0.1,
+        "slBufferAtr": 0.2,
+        "maxRiskAtr": 2.0,
+        "tp1R": 1,
+        "tp2R": 2,
+        "trailAtr": 0,
+        "maxHoldHours": 24
+      }
+    },
+    {
       "id": "breakout_volume",
       "label": "Cassure + volume",
       "detector": "breakout_volume",

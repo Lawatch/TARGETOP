@@ -34,6 +34,8 @@ const byVol = [...perps].sort((a, b) => (b.volumeQuote || 0) - (a.volumeQuote ||
 const universe = byVol.filter((t) => (t.volumeQuote || 0) >= settings.universe.minVolumeQuoteUsd).slice(0, settings.universe.maxSymbols);
 for (const s of settings.universe.always) if (!universe.find((u) => u.symbol === s)) { const t = perps.find((p) => p.symbol === s); if (t) universe.push(t); }
 const tick = Object.fromEntries(perps.map((t) => [t.symbol, t]));
+// Seuls les plus liquides peuvent produire des signaux live ; le reste nourrit le labo (shadow).
+const liveSet = new Set([...universe.slice(0, settings.universe.liveMaxSymbols ?? universe.length).map((t) => t.symbol), ...settings.universe.always]);
 const priceOf = (sym) => tick[sym]?.last ?? tick[sym]?.markPrice;
 
 // 2) Détection
@@ -46,7 +48,10 @@ const res = await mapLimit(universe, 5, async (t) => {
   return evaluateAt(prep, now, strategies, meta, 'live').map((s) => ({ ...s, symbol: t.symbol }));
 });
 const freshSignals = [];
-res.forEach((r, n) => { if (r.ok) freshSignals.push(...r.value); else errors.push(`${universe[n].symbol}: ${r.error}`); });
+res.forEach((r, n) => {
+  if (!r.ok) return errors.push(`${universe[n].symbol}: ${r.error}`);
+  freshSignals.push(...r.value.filter((s) => stratById[s.strategy]?.status !== 'live' || liveSet.has(s.symbol)));
+});
 
 // 3) Signaux actifs (frais + précédents encore valides)
 const validMs = (s) => (settings.signalValidityMinutes[s.tf || '15m'] ?? 45) * 60e3;
