@@ -11,10 +11,10 @@
 - **Live** : 2 premiers trades clos, tous deux gagnants : `trend_pullback@1` short SOL **+1,39R** et XRP **+1,17R** (TP1 atteint, puis sortie au breakeven), soit **+2,56R** au total, 0 perte. 4 trades ouverts (XBT, HYPE avec TP1 déjà touché, ADA, DOGE). MAE max −0,32R.
 - **Alerte Stratège** : 6/6 trades sont du `trend_pullback` short. Le risque est corrélé : un rebond BTC toucherait les 4 positions ouvertes en même temps (pire cas ≈ −3R sur la journée, sous la limite de 6R). 2 trades seulement : statistiquement non significatif, aucune décision possible.
 
-## 🧠 Stratège · 2026-11-10 12h30 UTC
-- **Live** : 0 trade clos (4 ouverts, tous `trend_pullback@1` short) → aucune décision de promotion. Aucune nouvelle version (v1 créées aujourd'hui, garde-fou 24 h).
-- **Labo** : piste P1 `failed_breakout` (volume ≥ 1,5 et/ou stop + 0,5 ATR) testée sur 90 j / 25 symboles → rejetée : ces variantes n'améliorent que la 2e moitié (effet de régime probable). La v1 reste stable à +0,08R sur chaque moitié.
-- **Reco** : Analyste → suivre la concentration 100 % short (corrélation). Prochain passage Stratège → filtre de régime BTC 4h (P1).
+## 🧠 Stratège · 2026-11-10 15h30 UTC
+- **Live** : 2 trades clos (+2,56R, `trend_pullback@1` short), 6 ouverts → < 30 trades, aucune décision. Aucune nouvelle version (garde-fou 24 h).
+- **Labo** : filtre de régime BTC 4h (P1) analysé sur 90 j / 25 symboles. Pour `trend_pullback`, ne garder que les trades dans le sens de BTC 4h améliore l'espérance de +0,04R à +0,08R par trade (2e moitié +0,03R → +0,12R, 1re inchangée). Inutile pour `failed_breakout`, positif dans les deux régimes. `breakout_volume` est négatif partout.
+- **Reco** : Analyste → classer les trades live selon la tendance BTC 4h. Prochain Stratège (≥ 11/11) → implémenter et vraiment backtester le filtre avant une éventuelle `trend_pullback` v2.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.

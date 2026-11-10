@@ -34,3 +34,25 @@ Backtest 90 j / 25 symboles `--split`, `failed_breakout` seul :
 
 Décision : **rien ne change**. Les variantes ne gagnent que sur la 2e moitié de la période, ce qui ressemble à un effet de régime et pas à un avantage robuste. La v1 reste la seule à être stable sur les 2 moitiés.
 Note : sur la fenêtre glissante actuelle, la v1 donne +0,08R (contre +0,12R le 10/11 au matin), un avantage encore mince.
+
+## 2026-11-10 15h30 — Stratège : piste P1 filtre de régime BTC 4h (backtest seul, aucun changement)
+
+Live : 2 trades clos (`trend_pullback@1` short, +2,56R), 6 ouverts → toujours < 30 trades, aucune décision live/shadow.
+
+Méthode : backtest 90 j / 25 symboles (toutes stratégies), puis chaque trade est classé selon la tendance BTC 4h à l'ouverture (EMA20 vs EMA50 de PF_XBTUSD en 4h). « Aligné » = long quand BTC 4h haussier, short quand BTC 4h baissier. C'est une approximation a posteriori : un vrai filtre libérerait des créneaux et changerait un peu la séquence des trades.
+
+| Stratégie | Sous-ensemble | Trades | Exp. | PF | 1re moitié | 2e moitié |
+|---|---|---|---|---|---|---|
+| `trend_pullback` | tous | 838 | +0,04R | 1,07 | +0,05R | +0,03R |
+| `trend_pullback` | aligné BTC | 687 | **+0,08R** | 1,14 | +0,05R | **+0,12R** |
+| `trend_pullback` | contre BTC | 151 | −0,16R | 0,77 | +0,06R | −0,43R |
+| `failed_breakout` | tous | 443 | +0,13R | 1,22 | +0,06R | +0,19R |
+| `failed_breakout` | aligné BTC | 180 | +0,16R | 1,27 | +0,10R | +0,22R |
+| `failed_breakout` | contre BTC | 263 | +0,10R | 1,19 | +0,04R | +0,17R |
+
+Lecture :
+- `trend_pullback` : le filtre ne change rien sur la 1re moitié (+0,05R) et améliore la 2e (+0,03R → +0,12R) en coupant une queue perdante (contre-tendance BTC : −0,43R/trade sur la 2e moitié). C'est le cas « ne nuit pas sur une moitié, aide nettement sur l'autre », donc un **candidat pour `trend_pullback` v2**. Le drawdown reste toutefois élevé (≈ 50R sur 90 j, 25 symboles).
+- `failed_breakout` : positif dans les deux régimes, donc **pas de filtre** (c'est une stratégie de retournement, sa diversité de sens est un atout).
+- `breakout_volume` (shadow) : négatif dans presque tous les régimes (−0,15R puis −0,33R par moitié). Candidat à `disabled`.
+
+Décision : **rien ne change aujourd'hui**, car `trend_pullback` v1 date du 10/11 (garde-fou de 24 h). Prochaine étape, à partir du 11/11 : implémenter le filtre BTC 4h dans `src/core`, avec un test, puis refaire un backtest réel (et non a posteriori) avant toute v2.
