@@ -1,0 +1,102 @@
+{
+  "_doc": "Statuts: live = affiché comme opportunité + paper-tradé ; shadow = labo, paper-tradé et affiché à part ; disabled = ignoré. Toute modif de params => incrémenter version (le journal garde id@version). params.tf = timeframe de base (15m|1h).",
+  "strategies": [
+    {
+      "id": "failed_breakout",
+      "label": "Faux breakout (piège)",
+      "detector": "failed_breakout",
+      "version": 1,
+      "status": "live",
+      "params": {
+        "tf": "1h",
+        "minVolRatio": 1.2,
+        "minReject": 0.6,
+        "minPokeAtr": 0.1,
+        "slBufferAtr": 0.2,
+        "maxRiskAtr": 2.0,
+        "tp1R": 1.5,
+        "tp2R": 3,
+        "trailAtr": 0,
+        "maxHoldHours": 36
+      }
+    },
+    {
+      "id": "trend_pullback",
+      "label": "Pullback de tendance",
+      "detector": "trend_pullback",
+      "version": 1,
+      "status": "live",
+      "params": {
+        "minAdx1h": 20,
+        "pullbackBars": 6,
+        "touchAtr": 0.15,
+        "rsiMin": 48,
+        "rsiMax": 68,
+        "maxExtAtr": 2.5,
+        "slBufferAtr": 0.25,
+        "minRiskAtr": 0.8,
+        "maxRiskAtr": 2.5,
+        "tp1R": 1.5,
+        "tp2R": 8,
+        "maxHoldHours": 72,
+        "tf": "1h",
+        "trailAtr": 2,
+        "require4h": false
+      }
+    },
+    {
+      "id": "breakout_volume",
+      "label": "Cassure + volume",
+      "detector": "breakout_volume",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "minVolRatio": 2.0,
+        "minBody": 0.55,
+        "maxRangeAtr": 12,
+        "maxRsi": 82,
+        "slBufferAtr": 0.5,
+        "minRiskAtr": 1.0,
+        "maxRiskAtr": 2.0,
+        "tp1R": 1.5,
+        "tp2R": 3,
+        "maxHoldHours": 24,
+        "tf": "1h"
+      }
+    },
+    {
+      "id": "exhaustion_reversal",
+      "label": "Retournement d'excès",
+      "detector": "exhaustion_reversal",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "rsi1hHigh": 74,
+        "rsi1hLow": 26,
+        "minWick": 0.45,
+        "slBufferAtr": 0.3,
+        "maxRiskAtr": 2.0,
+        "tp1R": 1.2,
+        "tp2R": 2.2,
+        "maxHoldHours": 24,
+        "tf": "1h"
+      }
+    },
+    {
+      "id": "funding_squeeze",
+      "label": "Squeeze de funding",
+      "detector": "funding_squeeze",
+      "version": 1,
+      "status": "shadow",
+      "params": {
+        "fundingAbs": 0.0001,
+        "minVolRatio": 1.5,
+        "riskAtr": 1.2,
+        "tp1R": 1.5,
+        "tp2R": 3,
+        "maxHoldHours": 12,
+        "tf": "15m"
+      }
+    }
+  ]
+}

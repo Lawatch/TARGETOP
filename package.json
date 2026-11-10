@@ -1,0 +1,15 @@
+{
+  "name": "targetop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Radar d'opportunités crypto live (Kraken Futures) avec paper-trading continu",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "scan": "node src/scan.mjs --data ./site/data",
+    "backtest": "node src/backtest.mjs",
+    "build-site": "node src/build-site.mjs ./site",
+    "serve": "node src/serve.mjs ./site"
+  }
+}

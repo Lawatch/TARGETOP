@@ -1,0 +1,23 @@
+{
+  "universe": {
+    "minVolumeQuoteUsd": 750000,
+    "maxSymbols": 25,
+    "always": [
+      "PF_XBTUSD",
+      "PF_ETHUSD",
+      "PF_SOLUSD"
+    ]
+  },
+  "minScoreLive": 55,
+  "feePctPerSide": 0.05,
+  "slippagePctPerSide": 0.02,
+  "cooldownBarsAfterClose": 4,
+  "maxOpenTradesPerStrategy": 8,
+  "signalValidityMinutes": {
+    "15m": 45,
+    "1h": 100
+  },
+  "historyCandles15m": 400,
+  "historyCandles1h": 400,
+  "maxSameSideLiveSignals": 4
+}

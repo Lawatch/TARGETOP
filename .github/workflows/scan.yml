@@ -1,0 +1,50 @@
+name: Radar scan
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+  push:
+    paths: ['src/**', 'web/**', 'config/**', 'reports/**', 'docs/**', '.github/workflows/scan.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: radar-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    # Uniquement sur la branche par défaut (les branches de travail ne doivent pas écrire les données live)
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests du moteur
+        run: npm test
+      - name: Récupérer l'état live (branche gh-pages)
+        env:
+          REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+        run: |
+          if git ls-remote --exit-code --heads "$REPO_URL" gh-pages >/dev/null; then
+            git clone --depth 1 --branch gh-pages "$REPO_URL" site
+          else
+            mkdir site && git -C site init -b gh-pages && git -C site remote add origin "$REPO_URL"
+          fi
+      - name: Scan Kraken + paper-trading
+        run: node src/scan.mjs --data site/data
+      - name: Assembler le site
+        run: node src/build-site.mjs site
+      - name: Publier (gh-pages)
+        working-directory: site
+        run: |
+          git config user.name "targetop-radar"
+          git config user.email "targetop-radar@users.noreply.github.com"
+          git add -A
+          git commit -q -m "scan $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for i in 1 2 3 4; do git push origin gh-pages && exit 0; sleep $((2**i)); done
+          exit 1
