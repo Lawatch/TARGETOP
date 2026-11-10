@@ -62,3 +62,5 @@ td.num{text-align:right}
 .market th{white-space:normal}
 .perf td:first-child{white-space:normal}.perf td:first-child .tag{margin-top:3px;display:inline-block}
 @media (max-width:600px){.perf .opt{display:none}}
+.riskline{margin-top:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-size:13px}
+.riskline.ok{border-color:#14532d}.riskline.warn{border-color:#78350f;color:#fcd34d}.riskline.bad{border-color:#7f1d1d;color:#fca5a5}

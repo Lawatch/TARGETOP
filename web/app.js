@@ -235,6 +235,21 @@ function tradeR(t) {
   return t.realizedR + t.remaining * (dir * (p - t.entry)) / t.risk - t.feeR;
 }
 
+// Pire cas si tous les stops des trades radar sont touchés (en R de ton compte, exploration = ½ risque),
+// comparé à la limite du challenge : perte max jour (Prop) ou perte max totale (Funded).
+function riskLine(ts) {
+  const atStop = (t) => { const dir = t.side === 'long' ? 1 : -1; return (t.realizedR + t.remaining * (dir * (t.sl - t.entry)) / t.risk - t.feeR) * riskMult(t); };
+  const R = ts.reduce((a, t) => a + atStop(t), 0);
+  const usdR = risk.capital * risk.risk / 100;
+  const limPct = risk.daily > 0 ? risk.daily : risk.dd;
+  const limName = risk.daily > 0 ? 'perte max jour' : 'perte max';
+  const sides = new Set(ts.map((t) => t.side));
+  const corr = ts.length > 1 && sides.size === 1 ? ` · ⚠️ ${ts.length} trades ${ts[0].side === 'long' ? 'LONG' : 'SHORT'} : ils bougent ensemble` : '';
+  if (R >= 0) return `<div class="riskline ok">🛡️ Si tous les stops sont touchés : ${r2(R)} (${usd(R * usdR)}). Aucun risque de perte : stops au breakeven ou mieux${corr}.</div>`;
+  const share = limPct > 0 ? (-R * usdR) / (risk.capital * limPct / 100) : null;
+  const c = share == null ? 'warn' : share < 0.34 ? 'ok' : share < 0.67 ? 'warn' : 'bad';
+  return `<div class="riskline ${c}">🛡️ Si tous les stops sont touchés : <b>${r2(R)}</b> sur ton compte (<b>${usd(R * usdR)}</b>)${share == null ? '' : `, soit <b>${Math.round(share * 100)} %</b> de ta ${limName} (${limPct} %)`}${corr}.</div>`;
+}
 function renderOpen() {
   const all = (state.openTrades || []).slice().sort((a, b) => b.openTime - a.openTime);
   const radar = all.filter((t) => t.status !== 'shadow'); // live + explore (+ anciens statuts) : ce que tu peux réellement trader
@@ -246,7 +261,7 @@ function renderOpen() {
   }).join('')}</tbody></table></div>`;
   const wasOpen = !!document.querySelector('#open details[open]'); // garder le tiroir ouvert au rafraîchissement
   const labR = lab.reduce((a, t) => a + (tradeR(t) || 0), 0);
-  $('open').innerHTML = (radar.length ? table(radar) : '<div class="empty">Aucun trade radar ouvert.</div>')
+  $('open').innerHTML = (radar.length ? table(radar) + riskLine(radar) : '<div class="empty">Aucun trade radar ouvert.</div>')
     + (lab.length ? `<details class="panel"${wasOpen ? ' open' : ''}><summary>🧪 ${lab.length} trade(s) labo en cours <span class="muted">(stratégies en test, à ne pas trader · ${r2(labR)} cumulés)</span></summary>${table(lab)}</details>` : '');
 }
 
