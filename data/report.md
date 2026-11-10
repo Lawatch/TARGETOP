@@ -22,10 +22,10 @@
 - **Live** : radar clos 7 trades, **+6,01R** : `trend_pullback@1` 6/6, **+7,01R** (XBT clos à +1,25R à 18:37, toujours TP1 puis breakeven) ; `failed_breakout@1` 0/1, −1R. 0 trade radar ouvert. Pire journée +6,01R, série de pertes max 1. Labo : `breakout_volume` 1/3 clos, −1,27R (seul labo négatif) ; `squeeze_breakout`, `failed_breakout_quick` et `trend_pullback_btc` ont 0 trade clos (13 ouverts au total).
 - **Alerte Stratège** : rien de bloquant. Écart de mesure à vérifier : le Produit affiche +6,64R pour `trend_pullback`, le journal brut donne +7,01R (calcul des frais ?). `breakout_volume` confirme son espérance négative du backtest, candidat à l'abandon à 30 trades.
 
-## 🧠 Stratège · 2026-11-10 18h30 UTC
-- **Live** : 6 trades radar clos (+4,77R) → < 15 trades, aucune promotion ni coupe. Pas de nouvelle version des stratégies `explore` (garde-fou 24 h).
-- **Fait** : nouveau filtre générique `params.btcRegime` (tendance BTC 4h, testé) et variante labo **`trend_pullback_btc`** (shadow). Sur 180 j, les `trend_pullback` contre BTC perdent dans les 4 trimestres. Le filtre améliore les 2 moitiés (−0,05R → −0,02R, drawdown 203R → 156R), sans atteindre le seuil `explore`. Pour info : `failed_breakout` + filtre BTC passe à +0,04R, drawdown 146R → 53R.
-- **Reco** : Analyste → comparer `trend_pullback` et `trend_pullback_btc` en live. Prochain Stratège → volatilité BTC comme 2e filtre de régime, ou idée d'une autre famille (force relative vs BTC).
+## 🧠 Stratège · 2026-11-10 21h30 UTC
+- **Live** : radar 7 clos, **+6,64R net de frais**. L'écart avec les +7,01R de l'Analyste vient de `realizedR` (brut) ; le chiffre à utiliser est `resultR` (net). Aucune stratégie n'a 15 trades : pas de promotion ni de coupe.
+- **Fait** : filtre générique de volatilité BTC `params.btcVolMinPct` (testé) et variante labo **`donchian_trend_vol`**. Le suivi de tendance perd quand BTC est calme et gagne quand il est agité, sur les deux moitiés. En backtest 180 j : +0,16R → **+0,31R**, PF 1,55, drawdown 40R → 26R, moitiés +0,06 / +0,43R.
+- **Reco** : Analyste → suivre `donchian_trend_vol` contre `donchian_trend`. Stratège (≥ 11/11 21h) → `donchian_trend` v2 avec ce filtre si le labo ne le dément pas. Labo plein (12 stratégies actives) : retirer `breakout_volume` dès qu'il a 30 trades.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
