@@ -11,10 +11,10 @@ depuis un PC pro verrouillé, sans rien installer.
 | `src/core/*.mjs` | Moteur pur et testé : indicateurs, stratégies, paper-trading, stats. Partagé par le scan live et le backtest. |
 | `config/strategies.json` | Stratégies, paramètres, **version** et **statut** (`live` / `shadow` / `disabled`). |
 | `config/settings.json` | Univers (top 25 perps par volume), score min, frais, validité des signaux. |
-| `src/scan.mjs` | Scan live (GitHub Actions toutes les ~10 min) : détecte, ouvre/suit/clôture les trades papier, écrit `data/*.json`. |
+| `src/scan.mjs` | Scan live (GitHub Actions toutes les ~7 min) : détecte, ouvre/suit/clôture les trades papier, écrit `data/*.json`. |
 | `src/backtest.mjs` | Backtest walk-forward sur l'historique Kraken (`--days --symbols --strategies --override --split`). |
 | `web/` | Front-end sans dépendance (HTML/CSS/JS). Prix live via WebSocket Kraken si le réseau le permet. |
-| `.github/workflows/scan.yml` | Cron : tests → scan → build du site → push sur la branche `gh-pages` (= site + données). |
+| `.github/workflows/scan.yml` | Tests puis **boucle** scan → build → push `gh-pages` toutes les ~7 min pendant ~5h50 ; relancée par le cron (15 min) et par chaque push (le plus récent remplace l'ancien, donc le nouveau code est déployé tout de suite). |
 | branche `gh-pages` | **Source de vérité des résultats live** : `data/journal.json` (tous les trades), `data/state.json`, `data/health.json`. |
 | `reports/LATEST.md` | Dernier rapport d'agent (affiché sur le site). Les rapports datés vont dans `reports/AAAA-MM-JJ-<role>.md`. |
 | `docs/STRATEGY_LOG.md` | Journal de toutes les décisions de stratégie (affiché sur le site). |

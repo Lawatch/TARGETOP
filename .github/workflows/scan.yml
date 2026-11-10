@@ -1,7 +1,10 @@
 name: Radar scan
+# Chaque run scanne en boucle toutes les ~7 min pendant ~5h50 (le cron GitHub est souvent en retard ou sauté).
+# Le cron (toutes les 15 min) et chaque push relancent la boucle si besoin ; le plus récent remplace le précédent
+# (cancel-in-progress), ce qui déploie aussi immédiatement le nouveau code poussé par les agents.
 on:
   schedule:
-    - cron: '*/10 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
   push:
     paths: ['src/**', 'web/**', 'config/**', 'reports/**', 'docs/**', '.github/workflows/scan.yml']
@@ -11,14 +14,17 @@ permissions:
 
 concurrency:
   group: radar-scan
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   scan:
     # Uniquement sur la branche par défaut (les branches de travail ne doivent pas écrire les données live)
     if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 358
+    env:
+      LOOP_MINUTES: 345
+      INTERVAL_SECONDS: 420
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,16 +41,20 @@ jobs:
           else
             mkdir site && git -C site init -b gh-pages && git -C site remote add origin "$REPO_URL"
           fi
-      - name: Scan Kraken + paper-trading
-        run: node src/scan.mjs --data site/data
-      - name: Assembler le site
-        run: node src/build-site.mjs site
-      - name: Publier (gh-pages)
-        working-directory: site
+          git -C site config user.name "targetop-radar"
+          git -C site config user.email "targetop-radar@users.noreply.github.com"
+      - name: Boucle scan Kraken + paper-trading + publication
         run: |
-          git config user.name "targetop-radar"
-          git config user.email "targetop-radar@users.noreply.github.com"
-          git add -A
-          git commit -q -m "scan $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
-          for i in 1 2 3 4; do git push origin gh-pages && exit 0; sleep $((2**i)); done
-          exit 1
+          end=$(( $(date +%s) + LOOP_MINUTES * 60 ))
+          while :; do
+            start=$(date +%s)
+            if node src/scan.mjs --data site/data && node src/build-site.mjs site; then
+              (cd site && git add -A && git commit -q -m "scan $(date -u +%Y-%m-%dT%H:%MZ)" && \
+                for i in 1 2 3 4; do git push -q origin gh-pages && break; sleep $((2**i)); done) || echo "rien à publier / push échoué"
+            else
+              echo "::warning::scan en échec, nouvel essai au prochain tour"
+            fi
+            next=$(( start + INTERVAL_SECONDS ))
+            [ "$next" -ge "$end" ] && break
+            sleep $(( next - $(date +%s) > 0 ? next - $(date +%s) : 1 ))
+          done
