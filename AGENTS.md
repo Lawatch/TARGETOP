@@ -30,22 +30,36 @@ node src/scan.mjs --data ./site/data && node src/build-site.mjs ./site && node s
 git fetch origin gh-pages && git show origin/gh-pages:data/journal.json > /tmp/journal.json   # résultats live
 ```
 
+## Rotation des experts (un passage par heure)
+
+Trois sessions permanentes (une par rôle, avec le repo attaché) sont réveillées à tour de rôle :
+**H+07 Analyste → H+27 Stratège (heure suivante) → H+47 Produit (heure d'après)**, soit un passage d'expert
+chaque heure et chaque rôle toutes les 3 h. Agilité ≠ révolution : à chaque passage, **une petite amélioration
+mesurable ou rien**. Un passage « RAS » (rien à signaler) est un bon passage s'il est justifié.
+
+Garde-fous anti-agitation :
+- Stratège : **au plus 1 nouvelle version par stratégie par 24 h** (sauf bug), et aucune décision live/shadow
+  sur moins de 30 trades. Entre deux, il travaille en backtest, prépare des variantes `shadow`, ou ne fait rien.
+- Produit : 1 changement visible max par passage ; pas de refonte sans besoin constaté.
+- Analyste : rapport court ; un rapport complet seulement toutes les 12 h, sinon un point santé de 3 lignes.
+- Chaque passage commence par `git pull --rebase` et lit la fin de `reports/LATEST.md` pour reprendre le relais.
+
 ## Les rôles (une session = un rôle)
 
-### 1. 🔎 Analyste Live (QA & performance) — toutes les 6 h
+### 1. 🔎 Analyste Live (QA & performance) — toutes les 3 h
 - Récupère `gh-pages` : fraîcheur du scan (`state.generatedAt` < 30 min ?), erreurs (`health.json`), trades ouverts/clos.
 - Calcule : stats par stratégie@version, par sens, par actif, distribution des sorties (stop/BE/TP/temps), MFE/MAE moyens, écart live vs backtest.
 - Vérifie la conformité challenge : série de pertes max, pire journée en R (à 0,5 %/trade, la perte jour 3 % = 6R).
 - Écrit `reports/AAAA-MM-JJ-HHh-analyste.md` + remplace `reports/LATEST.md` (court : état, chiffres clés, alertes, recommandations).
 - Ne modifie pas les stratégies. Corrige seulement une panne évidente du scan (avec test).
 
-### 2. 🧠 Stratège Quant — 1 fois par jour
+### 2. 🧠 Stratège Quant — toutes les 3 h
 - Lit `reports/LATEST.md`, `docs/STRATEGY_LOG.md`, `docs/BACKLOG.md`, le journal live.
-- Applique les **règles de promotion** ci-dessous, puis propose **au plus 2 changements** par session :
+- Applique les **règles de promotion** ci-dessous, puis propose **au plus 1 changement** par passage :
   ajustement de paramètres (nouvelle version), nouvelle stratégie en `shadow`, filtre de régime, etc.
 - Tout changement est **backtesté avant** (`--days 90 --symbols 25 --split`, les 2 moitiés doivent être cohérentes) et consigné dans `docs/STRATEGY_LOG.md` (date, avant/après, chiffres, raison).
 
-### 3. 🛠️ Ingénieur Produit (UX & fiabilité) — 1 fois par jour
+### 3. 🛠️ Ingénieur Produit (UX & fiabilité) — toutes les 3 h
 - Rend l'outil plus utile **et plus simple** en fonction des résultats : ce qui marche est mis en avant, ce qui ne marche pas disparaît.
 - Corrige les bugs, garde le site léger (aucune dépendance externe, aucun CDN : le PC pro bloque beaucoup de choses).
 - Vérifie le rendu (Playwright préinstallé : `require('playwright')`) après chaque modif du front.
