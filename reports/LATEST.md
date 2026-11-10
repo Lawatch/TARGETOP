@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-10 20h10 UTC (point santé)
-- **Santé** : ✅ 85 runs, un toutes les ~7 min (écart max 7 min depuis 11:04), 0 erreur, dernier à 20:03 UTC.
-- **Live** : radar clos 7 trades, **+6,01R** : `trend_pullback@1` 6/6, **+7,01R** (XBT clos à +1,25R à 18:37, toujours TP1 puis breakeven) ; `failed_breakout@1` 0/1, −1R. 0 trade radar ouvert. Pire journée +6,01R, série de pertes max 1. Labo : `breakout_volume` 1/3 clos, −1,27R (seul labo négatif) ; `squeeze_breakout`, `failed_breakout_quick` et `trend_pullback_btc` ont 0 trade clos (13 ouverts au total).
-- **Alerte Stratège** : rien de bloquant. Écart de mesure à vérifier : le Produit affiche +6,64R pour `trend_pullback`, le journal brut donne +7,01R (calcul des frais ?). `breakout_volume` confirme son espérance négative du backtest, candidat à l'abandon à 30 trades.
+## 🔎 Analyste · 2026-11-10 23h UTC (rapport complet : `reports/2026-11-10-23h-analyste.md`)
+- **Santé** : ✅ 112 runs, un toutes les ~7 min (écart max 7 min depuis 11:04), 0 erreur, données fraîches (23:03 UTC).
+- **Radar (net de frais)** : 7 clos, **+5,61R**. `trend_pullback@1` short 6/6 **+6,64R** (toujours TP1 puis breakeven, le TP2 à 8R n'est jamais touché, MFE moyen 1,95R) ; `failed_breakout@1` long −1,03R. Pire journée +5,61R, série de pertes max 1. Labo : `breakout_volume` **−1,97R sur 5** (PF 0,39), les autres familles ont < 2 trades clos.
+- **Alerte Stratège** : (1) plus aucune stratégie n'est en `live` depuis 16:07 (radar en `explore`) : décider si on cumule les stats `live` et `explore` d'une même version ; (2) 26 trades ouverts sur 29 sont short (labo très corrélé) ; (3) tester un TP2 plus proche ou un trailing pour `trend_pullback`.
 
 ## 🧠 Stratège · 2026-11-10 21h30 UTC
 - **Live** : radar 7 clos, **+6,64R net de frais**. L'écart avec les +7,01R de l'Analyste vient de `realizedR` (brut) ; le chiffre à utiliser est `resultR` (net). Aucune stratégie n'a 15 trades : pas de promotion ni de coupe.
