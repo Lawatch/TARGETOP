@@ -261,21 +261,34 @@ function tradeR(t) {
   return t.realizedR + t.remaining * (dir * (p - t.entry)) / t.risk - t.feeR;
 }
 
-// Pire cas si tous les stops des trades radar sont touchés (en R de ton compte, exploration = ½ risque),
-// comparé à la limite du challenge : perte max jour (Prop) ou perte max totale (Funded).
+// Journée du challenge (UTC) : réalisé du jour + pire cas si tous les stops ouverts sont touchés,
+// en R de ton compte (exploration = ½ risque), comparé à la perte max jour (Prop) ou totale (Funded).
 function riskLine(ts) {
   const atStop = (t) => { const dir = t.side === 'long' ? 1 : -1; return (t.realizedR + t.remaining * (dir * (t.sl - t.entry)) / t.risk - t.feeR) * riskMult(t); };
-  const R = ts.reduce((a, t) => a + atStop(t), 0);
+  const openR = ts.reduce((a, t) => a + atStop(t), 0);
+  const day0 = new Date(); day0.setUTCHours(0, 0, 0, 0);
+  const rc = state.recentClosed || [];
+  const today = rc.filter((t) => t.status !== 'shadow' && t.closeTime >= +day0);
+  const doneR = today.reduce((a, t) => a + (t.resultR || 0) * riskMult(t), 0);
+  const partial = rc.length > 0 && Math.min(...rc.map((t) => t.closeTime)) >= +day0; // historique tronqué : au moins ce montant
+  if (!ts.length && !today.length) return '';
   const usdR = risk.capital * risk.risk / 100;
   const limPct = risk.daily > 0 ? risk.daily : risk.dd;
   const limName = risk.daily > 0 ? 'perte max jour' : 'perte max';
+  const worst = doneR + Math.min(openR, 0);
+  const share = limPct > 0 && worst < 0 ? (-worst * usdR) / (risk.capital * limPct / 100) : 0;
+  const c = share < 0.34 ? 'ok' : share < 0.67 ? 'warn' : 'bad';
   const sides = new Set(ts.map((t) => t.side));
-  const corr = ts.length > 1 && sides.size === 1 ? ` · ⚠️ ${ts.length} trades ${ts[0].side === 'long' ? 'LONG' : 'SHORT'} : ils bougent ensemble` : '';
-  if (R >= 0) return `<div class="riskline ok">🛡️ Si tous les stops sont touchés : ${r2(R)} (${usd(R * usdR)}). Aucun risque de perte : stops au breakeven ou mieux${corr}.</div>`;
-  const share = limPct > 0 ? (-R * usdR) / (risk.capital * limPct / 100) : null;
-  const c = share == null ? 'warn' : share < 0.34 ? 'ok' : share < 0.67 ? 'warn' : 'bad';
-  return `<div class="riskline ${c}">🛡️ Si tous les stops sont touchés : <b>${r2(R)}</b> sur ton compte (<b>${usd(R * usdR)}</b>)${share == null ? '' : `, soit <b>${Math.round(share * 100)} %</b> de ta ${limName} (${limPct} %)`}${corr}.</div>`;
+  const corr = ts.length > 1 && sides.size === 1 ? `<br>⚠️ ${ts.length} trades ${ts[0].side === 'long' ? 'LONG' : 'SHORT'} ouverts : ils bougent ensemble.` : '';
+  const parts = [];
+  if (today.length) parts.push(`réalisé ${partial ? 'au moins ' : ''}<b>${r2(doneR)}</b> (${usd(doneR * usdR)}) sur ${today.length} trade(s) radar clos`);
+  if (ts.length) parts.push(openR >= 0 ? 'trades ouverts : stops au breakeven ou mieux, plus de perte possible' : `si tous les stops ouverts sont touchés : <b>${r2(openR)}</b> (${usd(openR * usdR)})`);
+  const verdict = worst >= 0 ? 'aucune perte possible sur la journée.'
+    : `pire fin de journée <b>${r2(worst)}</b> (${usd(worst * usdR)}), soit <b>${Math.round(share * 100)} %</b> de ta ${limName} (${limPct} %).`
+      + (limPct > 0 && -doneR * usdR >= risk.capital * limPct / 100 ? ' ⛔ Limite déjà atteinte par les trades clos : n\'ouvre plus rien aujourd\'hui.' : share >= 1 ? ' ⛔ Tu peux dépasser ta limite : n\'ouvre plus rien aujourd\'hui.' : share >= 0.67 ? ' Évite d\'ouvrir de nouvelles positions aujourd\'hui.' : '');
+  return `<div class="riskline ${c}">🛡️ Aujourd'hui (UTC) : ${parts.join(' · ')} → ${verdict}${corr}</div>`;
 }
+
 function renderOpen() {
   const all = (state.openTrades || []).slice().sort((a, b) => b.openTime - a.openTime);
   const radar = all.filter((t) => t.status !== 'shadow'); // live + explore (+ anciens statuts) : ce que tu peux réellement trader
@@ -287,7 +300,7 @@ function renderOpen() {
   }).join('')}</tbody></table></div>`;
   const wasOpen = !!document.querySelector('#open details[open]'); // garder le tiroir ouvert au rafraîchissement
   const labR = lab.reduce((a, t) => a + (tradeR(t) || 0), 0);
-  $('open').innerHTML = (radar.length ? table(radar) + riskLine(radar) : '<div class="empty">Aucun trade radar ouvert.</div>')
+  $('open').innerHTML = (radar.length ? table(radar) : '<div class="empty">Aucun trade radar ouvert.</div>') + riskLine(radar)
     + (lab.length ? `<details class="panel"${wasOpen ? ' open' : ''}><summary>🧪 ${lab.length} trade(s) labo en cours <span class="muted">(stratégies en test, à ne pas trader · ${r2(labR)} cumulés)</span></summary>${table(lab)}</details>` : '');
 }
 
