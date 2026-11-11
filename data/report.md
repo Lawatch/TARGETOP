@@ -22,10 +22,10 @@
 - **Radar** : aucun trade clos depuis 17h. 20 clos, **+1,23R** ; 11/11 à −4,38R. **5 trades ouverts, aucun sécurisé** : pire cas du jour ≈ **−9,4R** (limite −6R). DASH (MAE −0,90R) et ZEC long (−0,97R) restent au bord du stop.
 - **⚠️ Alerte Stratège/Produit** : **positions contradictoires sur ZEC**, `failed_breakout` long et `trend_pullback` short ouverts en même temps. En réel, elles s'annulent tout en payant deux fois les frais, et cela double le risque affiché. À traiter dans la règle de portefeuille (1 seule position par actif). Labo 11/11 : −36,2R sur 58 trades ; `funding_squeeze` enregistre son 1er trade (+0,61R).
 
-## 🧠 Stratège · 2026-11-11 18h30 UTC
-- **Cycle de vie** : `trend_pullback@1` 18 trades, E +0,09R, DD 5R → **reste `explore`**, aucun seuil atteint. Mais il est à −0,42R/trade depuis le 10/11 20h : ses gains viennent des 6 premiers shorts. Labo : `trend_pullback_btc` (22 trades), `rsi2_pullback` (14) et `breakout_volume` (9) vont vers un retrait, mais seulement à 30 trades.
-- **Diagnostic** `trend_pullback_btc` 3/22 : pas de bug. 15 de ses 25 trades n'existent pas chez le parent (symboles hors top 25, ou parent déjà en position, en délai de carence ou bloqué par le score min) et font −13,3R. La comparaison avec le parent est faussée : le filtre BTC reste non concluant en live (P2 du backlog : univers top 25 pour les variantes).
-- **⚠️ Utilisateur** : le 11/11 est à −4,38R, pire cas ≈ −7,4R. La règle P0 (stop journée à −3R + max 3 positions dans le même sens) attend toujours ta validation.
+## 🧠 Stratège · 2026-11-11 21h30 UTC
+- **Cycle de vie** : aucun seuil atteint. `trend_pullback@1` a 18 trades (E +0,09R) et reste `explore` ; le labo est sous 30 trades partout.
+- **`donchian_trend` v2 rejetée** : au re-test, le filtre de volatilité BTC **dégrade** le 90 j (+0,28 → +0,11R) et n'aide plus la 1re moitié du 180 j. C'est un effet de fenêtre, donc pas de version. Leçon ajoutée dans `docs/LESSONS.md` : valider un filtre sur plusieurs fenêtres.
+- **Portefeuille** : positions radar contraires sur ZEC → ajouté à la règle P0 « une seule position radar par actif ». **Utilisateur** : la règle P0 complète attend toujours ta validation (pire cas du jour estimé à −9,4R par l'Analyste).
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
