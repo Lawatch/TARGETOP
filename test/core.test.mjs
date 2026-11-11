@@ -178,3 +178,20 @@ test('filtre de volatilité BTC : btcVolMinPct ignore les périodes calmes', asy
   assert.equal(runStrategy(st, { ...base, btc4h: null }), null);
   delete DETECTORS.__fakeVol;
 });
+
+test('btcRegimeAt : tendance BTC 4h à la dernière bougie close', async () => {
+  const { prepareBtc4h, btcRegimeAt } = await import('../src/core/engine.mjs');
+  const H = 3600e3;
+  const up = Array.from({ length: 400 }, (_, i) => C(i * H, 100 + i, 101 + i, 99 + i, 100.5 + i));
+  const r = btcRegimeAt(prepareBtc4h(up), 400 * H);
+  assert.equal(r.trend4h, 'up');
+  assert.ok(r.volPct == null || (r.volPct >= 0 && r.volPct <= 1));
+  const down = up.map((c, i) => C(i * H, 500 - i, 501 - i, 499 - i, 499.5 - i));
+  assert.equal(btcRegimeAt(prepareBtc4h(down), 400 * H).trend4h, 'down');
+  assert.equal(btcRegimeAt(null, 0), null);
+  assert.equal(btcRegimeAt(prepareBtc4h(up.slice(0, 100)), 100 * H), null); // historique insuffisant
+  // 400 bougies 1h = 100 bougies 4h : pas assez pour le centile de volatilité (120) → le scan doit en charger ≥ 800
+  assert.equal(btcRegimeAt(prepareBtc4h(up), 400 * H).volPct, null);
+  const long = Array.from({ length: 800 }, (_, i) => C(i * H, 100 + i, 101 + i + (i % 5), 99 + i, 100.5 + i));
+  assert.ok(Number.isFinite(btcRegimeAt(prepareBtc4h(long), 800 * H).volPct));
+});

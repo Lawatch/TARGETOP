@@ -4,7 +4,7 @@
 // (Les détecteurs nomment historiquement base=s15, htf=s1h, htf2=s4h.)
 import { buildSeries, lastClosedIndex } from './series.mjs';
 import { resample } from './indicators.mjs';
-import { runStrategy } from './strategies.mjs';
+import { runStrategy, btcVolPct } from './strategies.mjs';
 
 export const MS15 = 900e3, MS1H = 3600e3, MS4H = 14400e3;
 const TFMS = { '15m': MS15, '1h': MS1H, '4h': MS4H };
@@ -12,6 +12,15 @@ const TFMS = { '15m': MS15, '1h': MS1H, '4h': MS4H };
 // Série 4h de BTC (pour params.btcRegime), construite à partir des bougies 1h de PF_XBTUSD.
 export function prepareBtc4h(c1h) {
   return c1h && c1h.length ? buildSeries(resample(c1h, MS4H)) : null;
+}
+
+// Régime BTC à l'instant t (dernière bougie 4h clôturée) : tendance EMA20/EMA50 et rang centile de volatilité.
+// Sert à l'affichage (tag « contre BTC ») ; mêmes définitions que params.btcRegime / params.btcVolMinPct.
+export function btcRegimeAt(btc4h, t) {
+  if (!btc4h) return null;
+  const kb = lastClosedIndex(btc4h, t, MS4H);
+  if (kb < 50 || !Number.isFinite(btc4h.ema20[kb]) || !Number.isFinite(btc4h.ema50[kb])) return null;
+  return { trend4h: btc4h.ema20[kb] > btc4h.ema50[kb] ? 'up' : 'down', volPct: btcVolPct(btc4h, kb), barTime: btc4h.candles[kb].t };
 }
 
 export function prepareSymbol(c15, c1h) {

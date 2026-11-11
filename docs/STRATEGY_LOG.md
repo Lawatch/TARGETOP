@@ -220,3 +220,11 @@ Pourquoi pas de `trend_pullback` v2 avec `btcRegime: "with"` (le garde-fou de 24
 - la variante labo `trend_pullback_btc` ne confirme pas pour l'instant (−0,71R/trade à période égale, n petit, univers de 50 cryptos).
 
 Décision : **rien ne change dans la stratégie**. Proposition sans risque pour le Produit : afficher sur les cartes un tag « ⚠️ contre BTC 4h » (la série BTC 4h est déjà calculée par le scan), pour que le trader évite ces trades à la main. À rediscuter si les trades contre BTC continuent de perdre (≥ 5 cas).
+
+## 2026-11-11 15h30 — Stratège : correctif `donchian_trend_vol` muet en live + régime BTC exposé (aucun changement de paramètres)
+
+Live : `trend_pullback@1` 14 trades, +3,03R (E +0,22R, DD 4,2R), sous les 15 trades du seuil de coupe, donc pas de décision. Aucune autre stratégie radar n'a de volume.
+
+**Bug corrigé** : le scan ne chargeait que 400 bougies 1h de BTC (= 100 bougies 4h), alors que le centile de volatilité de `params.btcVolMinPct` en exige 120. En live, le filtre refusait donc **tous** les signaux, et `donchian_trend_vol` (labo, créée le 10/11 21h30) n'a jamais pu trader : 0 trade, aucune stat à invalider. Le backtest n'était pas touché, car il charge 180 j d'historique. Correctif : le scan charge ≥ 800 bougies 1h pour BTC. Test ajouté. Les paramètres ne changent pas, donc pas de nouvelle version.
+
+**Affichage** : `state.market.btcRegime = { trend4h: "up"|"down", volPct, barTime }` (même définition que les filtres), pour le tag P1 « ⚠️ contre BTC 4h » du Produit. Au moment du scan de test : BTC 4h baissier, volatilité au 71e centile.

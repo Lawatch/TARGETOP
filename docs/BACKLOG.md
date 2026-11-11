@@ -34,7 +34,7 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [x] P2 Mobile : « Paper-trading en cours » tient dans l'écran (Actif ▲/▼, Stop, Prix, R live ; colonnes secondaires masquées < 600 px), vérifié iPhone 13 et SE (produit, 11/11 05h).
 - [x] P1 Opportunités : au-delà de 4 signaux, seuls les 3 premiers (hors actifs déjà en cours ; classement revu le 11/11 11h, voir ci-dessus) sont affichés, le reste est replié dans « Voir les N autres signaux » (produit, 11/11 08h).
 - [x] P0 Ligne 🛡️ « Aujourd'hui (UTC) » : réalisé du jour des trades radar + pire cas des stops ouverts = pire fin de journée, en R compte (½ risque en explore) et % de la perte max jour ; ⛔ si la limite peut être (ou est) dépassée (produit, 11/11 14h).
-- [ ] P1 Tag « ⚠️ contre BTC 4h » sur les cartes (proposé par le Stratège le 11/11 12h30) : nécessite que le scan expose la tendance BTC 4h dans `state.market` ou le signal.
+- [ ] P1 Tag « ⚠️ contre BTC 4h » sur les cartes (proposé par le Stratège le 11/11 12h30). **Données disponibles** depuis le 11/11 15h30 : `state.market.btcRegime.trend4h` (`up`/`down`) ; un long avec `down` (ou un short avec `up`) est « contre BTC ».
 - [ ] P3 Mobile : la page est très longue (Radar marché = 4 tableaux empilés) ; envisager de replier le Radar marché par défaut sur mobile.
 - [ ] P3 Mobile : les libellés « Stop +0,96 % » / « TP2 −7,70 % » passent sur 2 lignes dans les cases niveaux (raccourcir ou réduire la police).
 - [ ] P3 Mode « pré-alerte » : setup en formation (pas encore validé).

@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fetchTickers, fetchCandles, mapLimit, TF_MS } from './kraken.mjs';
-import { prepareSymbol, prepareBtc4h, evaluateAt, reanchor, MS15 } from './core/engine.mjs';
+import { prepareSymbol, prepareBtc4h, btcRegimeAt, evaluateAt, reanchor, MS15 } from './core/engine.mjs';
 import { openTrade, updateTrade } from './core/trade.mjs';
 import { computeStats, groupStats } from './core/stats.mjs';
 
@@ -44,7 +44,9 @@ const priceOf = (sym) => tick[sym]?.last ?? tick[sym]?.markPrice;
 // 2) Détection
 // Série BTC 4h partagée (filtre params.btcRegime) ; en cas d'échec, les stratégies filtrées BTC ne signalent rien.
 let btc4h = null;
-try { btc4h = prepareBtc4h(await fetchCandles('PF_XBTUSD', '1h', now - settings.historyCandles1h * TF_MS['1h'], now, { now })); }
+// ≥ 800 bougies 1h (= 200 bougies 4h) : le centile de volatilité (params.btcVolMinPct) a besoin de 120 bougies 4h d'historique.
+const btcHist1h = Math.max(800, settings.historyCandles1h);
+try { btc4h = prepareBtc4h(await fetchCandles('PF_XBTUSD', '1h', now - btcHist1h * TF_MS['1h'], now, { now })); }
 catch (e) { errors.push(`PF_XBTUSD (régime BTC): ${e.message}`); }
 const res = await mapLimit(universe, 5, async (t) => {
   const c15 = await fetchCandles(t.symbol, '15m', now - settings.historyCandles15m * TF_MS['15m'], now, { now });
@@ -125,6 +127,8 @@ const market = {
   fundingHigh: fundSorted.slice(0, 5).map(slim),
   fundingLow: fundSorted.slice(-5).reverse().map(slim),
   btc: tick.PF_XBTUSD ? slim(tick.PF_XBTUSD) : null,
+  // { trend4h: 'up'|'down', volPct: 0..1|null, barTime } : un signal long avec trend4h 'down' (ou short avec 'up') est « contre BTC »
+  btcRegime: btcRegimeAt(btc4h, now),
 };
 
 const durMs = Date.now() - t0;
