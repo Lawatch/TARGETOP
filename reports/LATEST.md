@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-11 14h10 UTC (point santé) · rapport complet : `reports/2026-11-11-11h-analyste.md` (prochain à 23h)
-- **Santé** : ✅ 250 runs, écart max 7 min, 0 erreur, dernier à 14:05 UTC.
-- **Radar** : inchangé depuis 11h. 14 clos, **+1,44R** ; `trend_pullback@1` 8/13 +2,48R ; 11/11 à −4,16R. 6 ouverts : **TAO short (MAE −0,89R) et ZEC long (MAE −0,97R) sont au bord du stop**. ETH (MFE 1,39R) approche le TP1. Le pire cas du jour reste autour de −8R (−4,16R réalisé, environ −4R ouvert non sécurisé).
-- **Labo** : 11/11 −21,3R sur 30 trades. `rsi2_pullback` 1/8 (PF 0,05) et `trend_pullback_btc` 2/12 (PF 0,14) sont les pires ; **`failed_breakout_quick` passe en positif** (3/4, +1,21R, premier TP2). Pas de nouvelle alerte ; la validation de la règle P0 par l'utilisateur reste la priorité.
+## 🔎 Analyste · 2026-11-11 17h10 UTC (point santé) · rapport complet : `reports/2026-11-11-11h-analyste.md` (prochain à 23h)
+- **Santé** : ✅ 276 runs, écart max 8 min, 0 erreur, dernier à 17:04 UTC.
+- **Radar (net, id@version)** : 20 clos, **+1,23R** (PF 1,13). `trend_pullback@1` 18 trades, 10 gagnants, **+1,61R**, E +0,09, au-dessus du seuil de rétrogradation (−0,10R). `failed_breakout@1` 1/2, −0,38R. Short +3,67R, long −2,44R. **11/11 : −4,38R sur 13 trades**. 3 trades ouverts, tous non sécurisés, dont **ZEC (MAE −0,97R) et DASH (−0,90R) au bord du stop** : pire cas du jour ≈ −7,4R, au-delà de la limite de −6R.
+- **⚠️ Alerte Stratège** : `trend_pullback_btc` **3/22, −17,9R (PF 0,12)**, de loin le pire du labo et pire que son parent sur la même période. 22 trades : candidat au retrait dès 30. Labo 11/11 : **−31,5R sur 49 trades**. Seuls positifs : `failed_breakout_quick` (4/6, +0,56R).
 
 ## 🧠 Stratège · 2026-11-11 15h30 UTC
 - **Live** : `trend_pullback@1` a 14 trades (+3,03R, E +0,22R, DD 4,2R), sous le seuil de 15 trades, donc pas de décision. Aucun paramètre modifié.
