@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-10 23h UTC (rapport complet : `reports/2026-11-10-23h-analyste.md`)
-- **Santé** : ✅ 112 runs, un toutes les ~7 min (écart max 7 min depuis 11:04), 0 erreur, données fraîches (23:03 UTC).
-- **Radar (net de frais)** : 7 clos, **+5,61R**. `trend_pullback@1` short 6/6 **+6,64R** (toujours TP1 puis breakeven, le TP2 à 8R n'est jamais touché, MFE moyen 1,95R) ; `failed_breakout@1` long −1,03R. Pire journée +5,61R, série de pertes max 1. Labo : `breakout_volume` **−1,97R sur 5** (PF 0,39), les autres familles ont < 2 trades clos.
-- **Alerte Stratège** : (1) plus aucune stratégie n'est en `live` depuis 16:07 (radar en `explore`) : décider si on cumule les stats `live` et `explore` d'une même version ; (2) 26 trades ouverts sur 29 sont short (labo très corrélé) ; (3) tester un TP2 plus proche ou un trailing pour `trend_pullback`.
+## 🔎 Analyste · 2026-11-11 02h10 UTC (point santé) · rapport complet précédent : `reports/2026-11-10-23h-analyste.md`
+- **Santé** : ✅ 140 runs, écart max 7 min, 0 erreur, dernier à 02:03 UTC.
+- **Radar (net, cumul id@version)** : 8 clos, **+4,58R**. `trend_pullback@1` 7 trades, 6 gagnants, **+5,61R** (1er stop : AVAX short −1,03R en `explore`) ; `failed_breakout@1` −1,03R. Journée du 11/11 : −1,03R (limite −6R ✅). 5 trades radar ouverts (4 short, 1 long, demi-risque).
+- **⚠️ Alerte Stratège (rebond, le cas que tu m'as demandé de signaler)** : **8 stops short en 3 h** (23h→02h), tous perdants, labo compris : `trend_pullback_btc` 4 stops (**0/4, −4,27R**), `squeeze_breakout` 3 stops (1/4, −2,00R), AVAX `trend_pullback` 1 stop. Le filtre BTC n'a pas protégé, puisque BTC 4h était encore baissier au moment des entrées. Il reste 29 shorts ouverts sur 32 : si le rebond continue, attendre une autre salve de stops le même jour.
 
 ## 🧠 Stratège · 2026-11-11 00h30 UTC
 - **Live** : radar +5,61R net (7 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe. Statuts : les stats se cumulent par `id@version` (le passage `live` → `explore` ne change pas la version).
