@@ -14,7 +14,7 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [x] P1 `failed_breakout` : volume plus strict / stop mèche + 0,5 ATR → testé le 10/11, rejeté (incohérent entre les 2 moitiés, voir STRATEGY_LOG). Si on y revient, ce sera via le filtre de régime.
 - [ ] P2 Ajouter l'historique de funding (endpoint `historicalfundingrates`) au backtest pour évaluer `funding_squeeze`.
 - [x] P2 Score : calibration testée le 11/11 (STRATEGY_LOG 09h30) → **le score ne prédit rien** (≥ 80 = parmi les pires).
-- [ ] P1 Produit : ne plus classer/mettre en avant les opportunités par score ; classer par stratégie (meilleur historique live) puis fraîcheur. Afficher le score en petit ou le retirer.
+- [x] P1 Produit : opportunités classées par actif pas encore en cours, puis historique live de la stratégie (espérance nette), puis fraîcheur ; score affiché en petit, gris, avec l'infobulle « non calibré » ; plus aucune mention de « meilleurs scores » (produit, 11/11 11h).
 - [ ] P2 Stratège : refaire le score (ex. espérance backtest de la stratégie × régime BTC courant) ou le supprimer ; à backtester avant.
 - [ ] P3 Open interest : détecter les hausses de prix avec OI en baisse (short squeeze) et inversement.
 - [ ] P3 Force relative vs BTC (classement momentum des alts).
@@ -31,7 +31,7 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [x] P1 Ligne « risque engagé » sous les trades radar : pire cas si tous les stops sont touchés (R, $, % de la perte max jour/totale) + alerte quand tous les trades sont dans le même sens (produit, 10/11 23h).
 - [x] P1 Carte d'opportunité : tag « 📈 Déjà en cours » si un trade radar est ouvert sur l'actif (ou ⚠️ si sens opposé), pour ne pas doubler la position. Correctifs : cases niveaux qui débordaient avec les micro-prix (PEPE), levier « 0.0x » → « <0.1x » (produit, 11/11 02h).
 - [x] P2 Mobile : « Paper-trading en cours » tient dans l'écran (Actif ▲/▼, Stop, Prix, R live ; colonnes secondaires masquées < 600 px), vérifié iPhone 13 et SE (produit, 11/11 05h).
-- [x] P1 Opportunités : au-delà de 4 signaux, seuls les 3 meilleurs scores (hors actifs déjà en cours) sont affichés, le reste est replié dans « Voir les N autres signaux » (produit, 11/11 08h).
+- [x] P1 Opportunités : au-delà de 4 signaux, seuls les 3 premiers (hors actifs déjà en cours ; classement revu le 11/11 11h, voir ci-dessus) sont affichés, le reste est replié dans « Voir les N autres signaux » (produit, 11/11 08h).
 - [ ] P3 Mobile : la page est très longue (Radar marché = 4 tableaux empilés) ; envisager de replier le Radar marché par défaut sur mobile.
 - [ ] P3 Mobile : les libellés « Stop +0,96 % » / « TP2 −7,70 % » passent sur 2 lignes dans les cases niveaux (raccourcir ou réduire la police).
 - [ ] P3 Mode « pré-alerte » : setup en formation (pas encore validé).

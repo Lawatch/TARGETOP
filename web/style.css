@@ -28,7 +28,7 @@ input,select{background:#0b0f14;border:1px solid var(--line);color:var(--text);b
 .sym{font-size:18px;font-weight:800}
 .side{font-weight:800;font-size:12px;padding:2px 8px;border-radius:6px;margin-right:6px}
 .side.long{background:#14532d;color:#86efac}.side.short{background:#7f1d1d;color:#fecaca}
-.score{font-weight:800;font-size:13px;border-radius:6px;padding:2px 8px;background:#1e293b}
+.score{font-weight:500;font-size:11px;border-radius:6px;padding:2px 6px;color:var(--muted);border:1px solid var(--line)}
 .score.a{background:#155e75;color:#a5f3fc}
 .sub{color:var(--muted);font-size:12px;margin:2px 0 8px}
 .levels{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
