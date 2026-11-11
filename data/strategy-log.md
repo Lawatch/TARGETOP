@@ -228,3 +228,16 @@ Live : `trend_pullback@1` 14 trades, +3,03R (E +0,22R, DD 4,2R), sous les 15 tra
 **Bug corrigé** : le scan ne chargeait que 400 bougies 1h de BTC (= 100 bougies 4h), alors que le centile de volatilité de `params.btcVolMinPct` en exige 120. En live, le filtre refusait donc **tous** les signaux, et `donchian_trend_vol` (labo, créée le 10/11 21h30) n'a jamais pu trader : 0 trade, aucune stat à invalider. Le backtest n'était pas touché, car il charge 180 j d'historique. Correctif : le scan charge ≥ 800 bougies 1h pour BTC. Test ajouté. Les paramètres ne changent pas, donc pas de nouvelle version.
 
 **Affichage** : `state.market.btcRegime = { trend4h: "up"|"down", volPct, barTime }` (même définition que les filtres), pour le tag P1 « ⚠️ contre BTC 4h » du Produit. Au moment du scan de test : BTC 4h baissier, volatilité au 71e centile.
+
+## 2026-11-11 18h30 — Stratège : revue du cycle de vie + diagnostic `trend_pullback_btc` 3/22 (aucun changement)
+
+Application des seuils d'AGENTS.md (journal net, `id@version`) :
+- `trend_pullback@1` (`explore`) : 18 trades, E **+0,09R**, DD 5,0R → ni coupe (E < −0,20R ou DD > 8R), ni promotion (30 trades) : **reste `explore`**. Attention : depuis le 10/11 20h, il est à −5,03R sur 12 trades (−0,42R/trade). Tous ses gains viennent des 6 premiers shorts.
+- Labo : `trend_pullback_btc` 22 trades, E −0,82R ; `rsi2_pullback` 14 trades, E −0,75R ; `breakout_volume` 9 trades, E −0,38R → **sous 30 trades, pas de retrait** (`shadow` → `disabled` à ≥ 30 trades et E < −0,15R). Ils sont sur la bonne trajectoire pour être retirés.
+
+Diagnostic `trend_pullback_btc` (pire que son parent alors qu'elle n'est qu'un sous-ensemble filtré) : **pas de bug du filtre**, ce ne sont pas les mêmes trades :
+- 10 trades sur 25 ont un équivalent chez le parent (même symbole, ± 2 h) : −4,62R contre −2,36R. Écart dû aux sorties (ETH : stop pour la variante, breakeven pour le parent, entrée décalée de 6 $).
+- **15 trades n'ont pas d'équivalent chez le parent** : −13,3R sur 14 clos. 6 sur des symboles absents du radar sur la période (NEAR, XMR, STRK, BNB, DOT, ACE), probablement hors top 25. 8 sur des symboles du radar, probablement parce que le parent avait déjà une position ouverte, était en délai de carence, ou que le score minimum ne s'applique qu'au radar.
+- Conclusion : une variante `shadow` d'une stratégie radar ne se compare pas à son parent tant qu'elle tourne sur un univers et des filtres différents. Le jugement live du filtre BTC reste **non concluant**. En revanche, le marché depuis le 10/11 20h est défavorable aux deux versions.
+
+Décision : rien ne change (pas de seuil atteint, pas de nouvelle version). Proposition au backlog : un paramètre `params.liveUniverseOnly` pour que les variantes labo d'une stratégie radar ne tournent que sur le top 25, comme leur parent.
