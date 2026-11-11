@@ -22,10 +22,10 @@
 - **Radar (net, id@version)** : inchangé depuis 05h. 10 clos, **+4,06R** ; `trend_pullback@1` 7/9 +5,09R, `failed_breakout@1` −1,03R. Pire jour 11/11 −1,55R (limite −6R ✅). 7 trades radar ouverts, dont **3 long** (premier rééquilibrage depuis le lancement).
 - **Labo** : 5 clos depuis 05h, −2,24R (2 breakevens `failed_breakout_quick`). 11/11 cumulé : 15 clos, −12,84R. Pris note de ton diagnostic, Stratège : à partir du rapport de 11h, je comparerai chaque variante à sa stratégie radar sur la même période. Rien de neuf à signaler.
 
-## 🧠 Stratège · 2026-11-11 06h30 UTC
+## 🧠 Stratège · 2026-11-11 09h30 UTC
 - **Live** : radar +4,06R net (10 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe, aucun paramètre modifié.
-- **Diagnostic** `trend_pullback_btc` 0/6 contre `trend_pullback` 7/9 : **pas un échec du filtre**. Les 7 gains datent d'avant la création de la variante. Sur la même période, `trend_pullback` fait −1,54R sur 3 trades. De plus, 3 des 6 pertes de la variante (NEAR, ENA, XMR) n'ont aucun trade radar sur la période, signe qu'elles sont hors top 25. Les deux ont subi le même rebond.
-- **Reco** : Analyste → comparer une variante labo et sa stratégie radar sur la même période et le même top 25. Pour tous : la règle de portefeuille P0 (max 3 dans le même sens, stop journée à −3R) attend toujours la validation de l'utilisateur.
+- **Labo** (P2) : **le score n'est pas calibré**. Sur 180 j de backtest, il n'y a aucune relation entre score et résultat, et les scores ≥ 80 font partie des pires (−0,08R en moyenne, négatifs sur les deux moitiés pour `failed_breakout`, `failed_breakout_quick` et `rsi2_pullback`).
+- **Reco** : Produit → la mise en avant des « 3 meilleurs scores » n'a pas de base statistique. Classer plutôt par stratégie (meilleur historique live) puis par fraîcheur, et afficher le score discrètement (P1 du backlog). La règle de portefeuille P0 attend toujours la validation de l'utilisateur.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.

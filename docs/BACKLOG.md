@@ -13,7 +13,9 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [ ] P2 `breakout_volume` (shadow) : négatif dans tous les régimes en backtest (−0,15R / −0,33R par moitié) → envisager `disabled` pour alléger le site.
 - [x] P1 `failed_breakout` : volume plus strict / stop mèche + 0,5 ATR → testé le 10/11, rejeté (incohérent entre les 2 moitiés, voir STRATEGY_LOG). Si on y revient, ce sera via le filtre de régime.
 - [ ] P2 Ajouter l'historique de funding (endpoint `historicalfundingrates`) au backtest pour évaluer `funding_squeeze`.
-- [ ] P2 Score : calibrer le score sur le résultat réel (les scores ≥ 75 gagnent-ils plus ?).
+- [x] P2 Score : calibration testée le 11/11 (STRATEGY_LOG 09h30) → **le score ne prédit rien** (≥ 80 = parmi les pires).
+- [ ] P1 Produit : ne plus classer/mettre en avant les opportunités par score ; classer par stratégie (meilleur historique live) puis fraîcheur. Afficher le score en petit ou le retirer.
+- [ ] P2 Stratège : refaire le score (ex. espérance backtest de la stratégie × régime BTC courant) ou le supprimer ; à backtester avant.
 - [ ] P3 Open interest : détecter les hausses de prix avec OI en baisse (short squeeze) et inversement.
 - [ ] P3 Force relative vs BTC (classement momentum des alts).
 
