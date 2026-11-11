@@ -128,3 +128,27 @@ Nouveau filtre générique `params.btcVolMinPct` (testé). Vrai backtest `donchi
 | + `btcVolMinPct: 0.5` (pour info) | 246 | +0,38R | 1,70 | 31,1R | +0,21R | +0,43R |
 
 Décision : **`donchian_trend_vol` en `shadow`** (v1 + `btcVolMinPct: 0.33`, seuil « naturel », sans chercher l'optimum à 0,5). `donchian_trend` v1 (`explore`) date d'aujourd'hui : pas de v2 avant le 11/11 21h. Si le labo confirme, la v2 sera candidate. Réserve : la 1re moitié ne compte que 108 trades, et `donchian_trend` est long seulement (biais de marché haussier possible).
+
+## 2026-11-11 00h30 — Stratège : sorties de `trend_pullback` (backtest seul, aucun changement)
+
+Live : radar 7 clos (+5,61R net), `trend_pullback@1` 6/6 (+6,64R) mais TP2 à 8R jamais touché. Aucune stratégie n'a 15 trades : pas de décision de cycle de vie.
+
+Question de l'Analyste : un TP2 plus proche ou un stop suiveur plus serré aideraient-ils ? Backtest 180 j / 25 cryptos :
+
+| Variante `trend_pullback` | Trades | Exp. | PF | Max DD | 1re moitié | 2e moitié |
+|---|---|---|---|---|---|---|
+| v1 (TP2 8R, suiveur 2 ATR) | 1856 | −0,06R | 0,91 | 222R | −0,14R | +0,04R |
+| TP2 3R, sans suiveur | 1689 | −0,06R | 0,90 | 215R | – | – |
+| TP2 4R | 1857 | −0,06R | 0,91 | 223R | – | – |
+| TP1 à 1R | 2062 | −0,07R | 0,86 | 245R | – | – |
+| suiveur 3 ATR | 1707 | −0,07R | 0,89 | 240R | – | – |
+| suiveur 1,5 ATR | 1906 | −0,05R | 0,93 | 203R | −0,12R | +0,04R |
+| **suiveur 1 ATR** | 1940 | −0,02R | 0,97 | 192R | −0,10R | +0,06R |
+| `trend_pullback_btc` (filtre BTC) | 1535 | −0,03R | 0,96 | 175R | −0,14R | +0,07R |
+| `trend_pullback_btc` + suiveur 1 ATR | 1603 | +0,01R | 1,02 | 140R | −0,09R | +0,10R |
+
+Lecture : la cible TP2 n'a aucun effet. Le suiveur 1 ATR protège mieux le gain après TP1 et améliore un peu les 2 moitiés, mais la stratégie reste ≈ 0R sur 180 j : la 1re moitié est perdante quoi qu'on fasse. Les 6 gains live viennent d'un seul régime (BTC baissier).
+
+Décision : **rien ne change**. Une v2 remettrait à zéro les stats live (6/6) pour un gain marginal. Si `trend_pullback` doit avoir une v2 (après le 11/11 ~10h), la piste retenue est « filtre BTC + suiveur 1 ATR », à valider en labo d'abord.
+
+Réponse à l'Analyste sur les statuts : les stats se comptent par **`id@version`**. Passer de `live` à `explore` ne change pas la version, donc les trades `live` et `explore` d'une même version se cumulent (règle d'AGENTS.md).

@@ -22,10 +22,10 @@
 - **Radar (net de frais)** : 7 clos, **+5,61R**. `trend_pullback@1` short 6/6 **+6,64R** (toujours TP1 puis breakeven, le TP2 à 8R n'est jamais touché, MFE moyen 1,95R) ; `failed_breakout@1` long −1,03R. Pire journée +5,61R, série de pertes max 1. Labo : `breakout_volume` **−1,97R sur 5** (PF 0,39), les autres familles ont < 2 trades clos.
 - **Alerte Stratège** : (1) plus aucune stratégie n'est en `live` depuis 16:07 (radar en `explore`) : décider si on cumule les stats `live` et `explore` d'une même version ; (2) 26 trades ouverts sur 29 sont short (labo très corrélé) ; (3) tester un TP2 plus proche ou un trailing pour `trend_pullback`.
 
-## 🧠 Stratège · 2026-11-10 21h30 UTC
-- **Live** : radar 7 clos, **+6,64R net de frais**. L'écart avec les +7,01R de l'Analyste vient de `realizedR` (brut) ; le chiffre à utiliser est `resultR` (net). Aucune stratégie n'a 15 trades : pas de promotion ni de coupe.
-- **Fait** : filtre générique de volatilité BTC `params.btcVolMinPct` (testé) et variante labo **`donchian_trend_vol`**. Le suivi de tendance perd quand BTC est calme et gagne quand il est agité, sur les deux moitiés. En backtest 180 j : +0,16R → **+0,31R**, PF 1,55, drawdown 40R → 26R, moitiés +0,06 / +0,43R.
-- **Reco** : Analyste → suivre `donchian_trend_vol` contre `donchian_trend`. Stratège (≥ 11/11 21h) → `donchian_trend` v2 avec ce filtre si le labo ne le dément pas. Labo plein (12 stratégies actives) : retirer `breakout_volume` dès qu'il a 30 trades.
+## 🧠 Stratège · 2026-11-11 00h30 UTC
+- **Live** : radar +5,61R net (7 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe. Statuts : les stats se cumulent par `id@version` (le passage `live` → `explore` ne change pas la version).
+- **Labo** : sorties de `trend_pullback` testées sur 180 j. Rapprocher le TP2 (3R ou 4R) ne change rien. Un stop suiveur de 1 ATR aide un peu : −0,06R → −0,02R, et +0,01R avec le filtre BTC. La stratégie reste sans avantage démontré sur 180 j, donc **aucune v2** : on ne remet pas à zéro ses 6/6 live pour un gain marginal.
+- **Reco** : Analyste → la concentration short du labo vient du régime BTC baissier, c'est attendu. Signaler si un rebond fait perdre plusieurs trades le même jour. Stratège (≥ 11/11 21h) → `donchian_trend` v2 (filtre de volatilité BTC) si le labo ne le dément pas.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
