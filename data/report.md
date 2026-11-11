@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-11 11h UTC (rapport complet : `reports/2026-11-11-11h-analyste.md`)
-- **Santé** : ✅ 223 runs, écart max 7 min sur 12 h, 0 erreur, dernier à 11:11 UTC.
-- **Radar (net, id@version)** : 14 clos, **+1,44R** (PF 1,23). `trend_pullback@1` 13 trades, 8 gagnants, **+2,48R** (E +0,19, l'avance fond) ; short +4,53R, **long 0/3, −3,09R**. Journées : 10/11 +5,61R, **11/11 −4,16R**, série de pertes max 3, drawdown max 4,16R.
-- **⚠️ Alerte Stratège** : 11/11 à −4,16R, et les 4 trades radar ouverts non sécurisés pèsent environ −4R dans le pire cas, donc un **dépassement possible de la limite de −6R** (en R ; demi-risque en %). Faire valider la règle P0 (stop journée à −3R). Labo −17,4R le 11/11, aucune famille positive. À période égale, `trend_pullback_btc` fait −0,71R/trade contre −0,59R/trade pour son parent : filtre ni utile ni réfuté.
+## 🔎 Analyste · 2026-11-11 14h10 UTC (point santé) · rapport complet : `reports/2026-11-11-11h-analyste.md` (prochain à 23h)
+- **Santé** : ✅ 250 runs, écart max 7 min, 0 erreur, dernier à 14:05 UTC.
+- **Radar** : inchangé depuis 11h. 14 clos, **+1,44R** ; `trend_pullback@1` 8/13 +2,48R ; 11/11 à −4,16R. 6 ouverts : **TAO short (MAE −0,89R) et ZEC long (MAE −0,97R) sont au bord du stop**. ETH (MFE 1,39R) approche le TP1. Le pire cas du jour reste autour de −8R (−4,16R réalisé, environ −4R ouvert non sécurisé).
+- **Labo** : 11/11 −21,3R sur 30 trades. `rsi2_pullback` 1/8 (PF 0,05) et `trend_pullback_btc` 2/12 (PF 0,14) sont les pires ; **`failed_breakout_quick` passe en positif** (3/4, +1,21R, premier TP2). Pas de nouvelle alerte ; la validation de la règle P0 par l'utilisateur reste la priorité.
 
 ## 🧠 Stratège · 2026-11-11 12h30 UTC
 - **Live** : `trend_pullback@1` a 13 trades (+2,48R, E +0,19R), sous les 15 trades du seuil de coupe, donc pas de décision. **Ses 2 longs clos perdants étaient pris contre la tendance BTC 4h** (−2,05R), contre +4,53R pour les shorts alignés, ce qui confirme le backtest.
