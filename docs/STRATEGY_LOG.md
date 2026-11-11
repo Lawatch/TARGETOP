@@ -241,3 +241,24 @@ Diagnostic `trend_pullback_btc` (pire que son parent alors qu'elle n'est qu'un s
 - Conclusion : une variante `shadow` d'une stratégie radar ne se compare pas à son parent tant qu'elle tourne sur un univers et des filtres différents. Le jugement live du filtre BTC reste **non concluant**. En revanche, le marché depuis le 10/11 20h est défavorable aux deux versions.
 
 Décision : rien ne change (pas de seuil atteint, pas de nouvelle version). Proposition au backlog : un paramètre `params.liveUniverseOnly` pour que les variantes labo d'une stratégie radar ne tournent que sur le top 25, comme leur parent.
+
+## 2026-11-11 21h30 — Stratège : `donchian_trend` v2 (filtre de volatilité BTC) **rejetée** après re-test
+
+Cycle de vie : aucun seuil atteint (`trend_pullback@1` 18 trades, E +0,09R, DD 5R → reste `explore` ; labo sous 30 trades).
+
+Échéance prévue (STRATEGY_LOG 10/11 21h30) : `donchian_trend` v2 avec `btcVolMinPct: 0.33`. Le garde-fou de 24 h est passé, et `donchian_trend` n'a aucun trade live : une v2 ne coûtait rien. Le labo n'a rien appris (bug corrigé à 15h30). Re-test sur les données du jour :
+
+| Fenêtre | Variante | Trades | Exp. | PF | Max DD | 1re moitié | 2e moitié |
+|---|---|---|---|---|---|---|---|
+| 180 j / 25 | v1 | 516 | +0,15R | 1,25 | 37,5R | −0,04R | +0,28R |
+| 180 j / 25 | + filtre vol. | 333 | +0,29R | 1,51 | 27,3R | −0,05R | +0,46R |
+| 90 j / 25 | v1 | 312 | +0,28R | 1,47 | 37,5R | +0,46R | **−0,36R** |
+| 90 j / 25 | + filtre vol. | 163 | **+0,11R** | 1,17 | 26,3R | +0,26R | −0,45R |
+
+Lecture : avec un jour de données en plus, le gain du filtre sur la 1re moitié de 180 j a disparu (hier +0,02 → +0,06R, aujourd'hui −0,04 → −0,05R). Sur 90 j, il **dégrade** l'espérance (+0,28 → +0,11R). C'est un effet de fenêtre, pas un avantage robuste. Leçon : un filtre doit être vérifié sur **plusieurs fenêtres** (90 et 180 j, plus des dates de fin décalées) avant une version.
+
+À noter aussi : les 45 derniers jours sont mauvais pour `donchian_trend` (−0,36R/trade, 68 trades). C'est une stratégie long seulement dans un marché baissier, ce qui explique l'absence de signal live. Elle reste `explore` (180 j : +0,15R, aucune moitié < −0,05R), à surveiller.
+
+Décision : **pas de v2**. `donchian_trend_vol` reste en labo pour mesurer en live (aucun coût).
+
+Portefeuille : l'Analyste signale deux positions radar **contraires sur ZEC** (`failed_breakout` long + `trend_pullback` short) : en réel, elles s'annulent et paient deux fois les frais. Ajouté à la règle P0 : **une seule position radar par actif**.
