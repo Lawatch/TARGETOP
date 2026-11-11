@@ -3,6 +3,7 @@
 Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète ce qu'il traite.
 
 ## Stratégie
+- [ ] **P0 Règle de portefeuille (à valider par l'utilisateur)** : max 3 positions radar dans le même sens + plus d'entrée après −3R réalisés dans la journée. Backtest 180 j : pire jour −25R → −7R (risque plein), −3,5R à demi-risque ; jours ≤ −6R : 57 → 2 (voir STRATEGY_LOG 11/11 03h30). À appliquer au paper-trading radar (scan) et à l'affichage (cartes « ne pas prendre : plafond atteint »).
 - [ ] P0 Intégrer les frais réels du challenge dans `config/settings.json` (`feePctPerSide`) dès qu'ils sont confirmés, et refaire les backtests de référence.
 - [ ] P1 Décliner le filtre `regime: "with"` sur `trend_pullback` / autres idées en variantes shadow (180 j / 25).
 - [x] P1 Filtre de régime BTC : tendance → `params.btcRegime` (variante `trend_pullback_btc`) ; volatilité → `params.btcVolMinPct` (variante `donchian_trend_vol`).

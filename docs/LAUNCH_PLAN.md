@@ -31,6 +31,9 @@ On prend du risque sur le **nombre d'idées testées**, pas sur la taille des po
 le radar à **demi-risque**, coupé vite si ça perd, post-mortem dans `docs/LESSONS.md`, nouvelle idée derrière.
 Au lancement : stratégies `live` à risque plein, stratégies `explore` à demi-risque, rien d'autre.
 
+## Règle de portefeuille (proposée le 11/11, à valider)
+Sans règle, le radar complet aurait eu 57 jours sur 180 pires que −6R (backtest), à cause de la corrélation entre cryptos. Proposition : **max 3 positions dans le même sens** et **plus d'entrée après −3R réalisés dans la journée**. Pire jour simulé : −7R à risque plein, −3,5R à demi-risque.
+
 ## Critères GO (par stratégie) pour le 1er décembre
 - Backtest 180 j / 25 symboles : espérance > +0,05R après frais, positive sur les 2 moitiés.
 - Paper live : ≥ 30 trades, espérance > 0, drawdown < 10R, aucune journée pire que −6R (= −3 % à 0,5 %/trade).
