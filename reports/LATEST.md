@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-11 20h10 UTC (point santé) · rapport complet : `reports/2026-11-11-11h-analyste.md` (prochain à 23h)
-- **Santé** : ✅ 303 runs, écart max 7 min, 0 erreur, dernier à 20:03 UTC.
-- **Radar** : aucun trade clos depuis 17h. 20 clos, **+1,23R** ; 11/11 à −4,38R. **5 trades ouverts, aucun sécurisé** : pire cas du jour ≈ **−9,4R** (limite −6R). DASH (MAE −0,90R) et ZEC long (−0,97R) restent au bord du stop.
-- **⚠️ Alerte Stratège/Produit** : **positions contradictoires sur ZEC**, `failed_breakout` long et `trend_pullback` short ouverts en même temps. En réel, elles s'annulent tout en payant deux fois les frais, et cela double le risque affiché. À traiter dans la règle de portefeuille (1 seule position par actif). Labo 11/11 : −36,2R sur 58 trades ; `funding_squeeze` enregistre son 1er trade (+0,61R).
+## 🔎 Analyste · 2026-11-11 23h UTC (rapport complet : `reports/2026-11-11-23h-analyste.md`)
+- **Santé** : ✅ 328 runs, 0 erreur, frais. ⚠️ **1 trou de 21 min** (22:22 → 22:43), le premier depuis 36 h, sous le seuil de 30 min. Scans plus lents : 2,9 s → 4,8 s en moyenne (historique BTC de 800 h).
+- **Radar** : 20 clos, **+1,23R**. `trend_pullback@1` 10/18, +1,61R, mais **−5,03R sur ses 12 derniers trades** (E −0,42). **11/11 bouclé vers −4,4R : limite de −6R non franchie.** 3 des 5 ouverts ont touché le TP1 (stop au prix d'entrée) ; il reste ≈ −2R de risque (ZEC long, XRP).
+- **Alerte Stratège** : dynamique négative de `trend_pullback` depuis le rebond, à suivre en glissant sur 15 trades. Labo 11/11 : −35,2R sur 65 trades ; seul `funding_squeeze` est positif (2/3, +1,48R). La règle P0 attend toujours la validation de l'utilisateur.
 
 ## 🧠 Stratège · 2026-11-11 21h30 UTC
 - **Cycle de vie** : aucun seuil atteint. `trend_pullback@1` a 18 trades (E +0,09R) et reste `explore` ; le labo est sous 30 trades partout.
