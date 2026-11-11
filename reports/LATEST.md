@@ -22,10 +22,10 @@
 - **Radar (net, id@version)** : 20 clos, **+1,23R** (PF 1,13). `trend_pullback@1` 18 trades, 10 gagnants, **+1,61R**, E +0,09, au-dessus du seuil de rétrogradation (−0,10R). `failed_breakout@1` 1/2, −0,38R. Short +3,67R, long −2,44R. **11/11 : −4,38R sur 13 trades**. 3 trades ouverts, tous non sécurisés, dont **ZEC (MAE −0,97R) et DASH (−0,90R) au bord du stop** : pire cas du jour ≈ −7,4R, au-delà de la limite de −6R.
 - **⚠️ Alerte Stratège** : `trend_pullback_btc` **3/22, −17,9R (PF 0,12)**, de loin le pire du labo et pire que son parent sur la même période. 22 trades : candidat au retrait dès 30. Labo 11/11 : **−31,5R sur 49 trades**. Seuls positifs : `failed_breakout_quick` (4/6, +0,56R).
 
-## 🧠 Stratège · 2026-11-11 15h30 UTC
-- **Live** : `trend_pullback@1` a 14 trades (+3,03R, E +0,22R, DD 4,2R), sous le seuil de 15 trades, donc pas de décision. Aucun paramètre modifié.
-- **Bug corrigé** : `donchian_trend_vol` (labo) ne pouvait jamais signaler en live, faute d'historique BTC suffisant pour le filtre de volatilité. Le scan charge maintenant 800 h de BTC (test ajouté). Elle n'avait aucun trade, donc pas de version à changer.
-- **Pour le Produit** : `state.market.btcRegime.trend4h` (`up`/`down`) est disponible pour le tag « ⚠️ contre BTC 4h ». La règle P0 (stop journée) attend toujours la validation de l'utilisateur.
+## 🧠 Stratège · 2026-11-11 18h30 UTC
+- **Cycle de vie** : `trend_pullback@1` 18 trades, E +0,09R, DD 5R → **reste `explore`**, aucun seuil atteint. Mais il est à −0,42R/trade depuis le 10/11 20h : ses gains viennent des 6 premiers shorts. Labo : `trend_pullback_btc` (22 trades), `rsi2_pullback` (14) et `breakout_volume` (9) vont vers un retrait, mais seulement à 30 trades.
+- **Diagnostic** `trend_pullback_btc` 3/22 : pas de bug. 15 de ses 25 trades n'existent pas chez le parent (symboles hors top 25, ou parent déjà en position, en délai de carence ou bloqué par le score min) et font −13,3R. La comparaison avec le parent est faussée : le filtre BTC reste non concluant en live (P2 du backlog : univers top 25 pour les variantes).
+- **⚠️ Utilisateur** : le 11/11 est à −4,38R, pire cas ≈ −7,4R. La règle P0 (stop journée à −3R + max 3 positions dans le même sens) attend toujours ta validation.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
