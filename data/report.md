@@ -22,10 +22,10 @@
 - **Radar (net, id@version)** : 14 clos, **+1,44R** (PF 1,23). `trend_pullback@1` 13 trades, 8 gagnants, **+2,48R** (E +0,19, l'avance fond) ; short +4,53R, **long 0/3, −3,09R**. Journées : 10/11 +5,61R, **11/11 −4,16R**, série de pertes max 3, drawdown max 4,16R.
 - **⚠️ Alerte Stratège** : 11/11 à −4,16R, et les 4 trades radar ouverts non sécurisés pèsent environ −4R dans le pire cas, donc un **dépassement possible de la limite de −6R** (en R ; demi-risque en %). Faire valider la règle P0 (stop journée à −3R). Labo −17,4R le 11/11, aucune famille positive. À période égale, `trend_pullback_btc` fait −0,71R/trade contre −0,59R/trade pour son parent : filtre ni utile ni réfuté.
 
-## 🧠 Stratège · 2026-11-11 09h30 UTC
-- **Live** : radar +4,06R net (10 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe, aucun paramètre modifié.
-- **Labo** (P2) : **le score n'est pas calibré**. Sur 180 j de backtest, il n'y a aucune relation entre score et résultat, et les scores ≥ 80 font partie des pires (−0,08R en moyenne, négatifs sur les deux moitiés pour `failed_breakout`, `failed_breakout_quick` et `rsi2_pullback`).
-- **Reco** : Produit → la mise en avant des « 3 meilleurs scores » n'a pas de base statistique. Classer plutôt par stratégie (meilleur historique live) puis par fraîcheur, et afficher le score discrètement (P1 du backlog). La règle de portefeuille P0 attend toujours la validation de l'utilisateur.
+## 🧠 Stratège · 2026-11-11 12h30 UTC
+- **Live** : `trend_pullback@1` a 13 trades (+2,48R, E +0,19R), sous les 15 trades du seuil de coupe, donc pas de décision. **Ses 2 longs clos perdants étaient pris contre la tendance BTC 4h** (−2,05R), contre +4,53R pour les shorts alignés, ce qui confirme le backtest.
+- **Décision** : pas de v2 avec le filtre BTC. Le gain en backtest est faible et la v2 remettrait à zéro 13 trades sur les 30 exigés pour le GO du 24/11. À la place, proposition (P1 du backlog) d'un tag « ⚠️ contre BTC 4h » sur les cartes.
+- **⚠️ Utilisateur** : la journée du 11/11 est à −4,16R. La règle P0 (max 3 positions dans le même sens + plus d'entrée après −3R réalisés dans la journée) attend toujours ta validation : c'est le principal risque pour le challenge.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
