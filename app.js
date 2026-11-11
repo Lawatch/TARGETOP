@@ -192,6 +192,9 @@ function already(s) {
   const same = t.signalBarTime === s.barTime;
   return `<div><span class="tag info">📈 Déjà en cours (entrée ${px(t.entry)}, ${ago(t.openTime)})${same ? '' : ' : ne double pas la position'}</span></div>`;
 }
+// Signal contre la tendance BTC 4h (EMA20/EMA50) ? En live comme en backtest 180 j, ces trades perdent (STRATEGY_LOG 11/11).
+const btcTrend = () => state?.market?.btcRegime?.trend4h; // 'up' | 'down' | undefined
+const againstBtc = (s) => { const t = btcTrend(); return (t === 'down' && s.side === 'long') || (t === 'up' && s.side === 'short'); };
 function card(s, compact) {
   const price = live[s.symbol] ?? s.price;
   const st = liveStatus(s, price);
@@ -213,6 +216,7 @@ function card(s, compact) {
     <div class="live"><span>Prix : <b class="lp">${px(price)}</b> <span class="lpd ${cls(dir * (price - s.entry))}">${price ? pct(((price - s.entry) / s.entry) * 100) : ''}</span></span><span class="tag ${st.cls} lst">${esc(st.txt)}</span></div>
     <div><span class="tag ${rel.cls}">${esc(rel.txt)}</span></div>
     ${already(s)}
+    ${againstBtc(s) ? `<div><span class="tag bad">⚠️ Contre la tendance BTC 4h (${btcTrend() === 'down' ? 'baissière' : 'haussière'}) : ce type de trade perd en live et en backtest</span></div>` : ''}
     ${compact ? '' : `<ul class="reasons">${(s.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`}
     <div class="size"><button class="copy">copier</button>${sizing(s, price)}</div>
   </div>`);
@@ -240,12 +244,12 @@ function renderSignals() {
   // Le score ne prédit pas le résultat (calibration 180 j, STRATEGY_LOG 11/11 09h30) : on classe par
   // historique live de la stratégie (espérance nette), puis par fraîcheur du signal.
   const edge = (s) => { const st = state.stats?.byStrategy?.[s.strategy]; return st?.trades ? st.expectancyR : 0; };
-  const ranked = liveSigs.slice().sort((a, b) => isOpen(a) - isOpen(b) || edge(b) - edge(a) || (b.closeTime || 0) - (a.closeTime || 0));
+  const ranked = liveSigs.slice().sort((a, b) => againstBtc(a) - againstBtc(b) || isOpen(a) - isOpen(b) || edge(b) - edge(a) || (b.closeTime || 0) - (a.closeTime || 0));
   const TOP = 3;
   if (ranked.length <= TOP + 1) ranked.forEach((s) => box.appendChild(card(s)));
   else {
     ranked.slice(0, TOP).forEach((s) => box.appendChild(card(s)));
-    const more = el(`<details id="more-sigs" class="panel" style="grid-column:1/-1"${wasOpen ? ' open' : ''}><summary>Voir les ${ranked.length - TOP} autres signaux <span class="muted">(stratégie moins prouvée en live, signal plus ancien ou actif déjà en cours : à éviter si tu as déjà tes positions)</span></summary><div class="cards"></div></details>`);
+    const more = el(`<details id="more-sigs" class="panel" style="grid-column:1/-1"${wasOpen ? ' open' : ''}><summary>Voir les ${ranked.length - TOP} autres signaux <span class="muted">(contre BTC 4h, stratégie moins prouvée en live, signal plus ancien ou actif déjà en cours : à éviter si tu as déjà tes positions)</span></summary><div class="cards"></div></details>`);
     ranked.slice(TOP).forEach((s) => more.querySelector('.cards').appendChild(card(s, true)));
     box.appendChild(more);
   }
@@ -374,7 +378,9 @@ function renderHeader() {
   bn.hidden = age < STALE_MS;
   if (!bn.hidden) bn.textContent = `⚠️ Dernier scan ${ago(state.generatedAt)} (${new Date(state.generatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}) : le radar est en retard, ces opportunités peuvent être périmées. Vérifie le prix sur Kraken avant d'entrer.`;
   const b = live.PF_XBTUSD ?? state.market?.btc?.last;
-  $('pill-btc').innerHTML = `BTC ${px(b)} <span class="${cls(state.market?.btc?.change24h)}">${pct(state.market?.btc?.change24h)}</span>`;
+  const tr = btcTrend();
+  $('pill-btc').innerHTML = `BTC ${px(b)} <span class="${cls(state.market?.btc?.change24h)}">${pct(state.market?.btc?.change24h)}</span>${tr ? ` · 4h <span class="${tr === 'up' ? 'pos' : 'neg'}">${tr === 'up' ? '↗ haussier' : '↘ baissier'}</span>` : ''}`;
+  $('pill-btc').title = tr ? `Tendance BTC 4h (EMA20 vs EMA50) : ${tr === 'up' ? 'haussière' : 'baissière'}. Les signaux dans l'autre sens sont signalés « contre BTC ».` : '';
 }
 
 function renderAll() {
