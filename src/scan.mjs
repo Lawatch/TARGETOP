@@ -142,6 +142,10 @@ const state = {
   signals,
   openTrades: all.filter((t) => t.state === 'open').map((t) => ({ ...t, price: priceOf(t.symbol) })),
   recentClosed: all.filter((t) => t.state === 'closed').sort((a, b) => b.closeTime - a.closeTime).slice(0, 40),
+  // Trades radar (hors labo) clôturés depuis minuit UTC : la ligne « Aujourd'hui » du site ne doit pas dépendre
+  // de recentClosed, tronqué à 40 trades (labo compris) et donc incomplet les jours chargés.
+  todayClosed: all.filter((t) => t.state === 'closed' && t.status !== 'shadow' && t.closeTime >= now - (now % 86400000))
+    .map(({ id, symbol, strategy, version, status, side, closeTime, resultR }) => ({ id, symbol, strategy, version, status, side, closeTime, resultR })),
   stats,
   market,
 };

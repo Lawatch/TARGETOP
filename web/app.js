@@ -271,10 +271,12 @@ function riskLine(ts) {
   const atStop = (t) => { const dir = t.side === 'long' ? 1 : -1; return (t.realizedR + t.remaining * (dir * (t.sl - t.entry)) / t.risk - t.feeR) * riskMult(t); };
   const openR = ts.reduce((a, t) => a + atStop(t), 0);
   const day0 = new Date(); day0.setUTCHours(0, 0, 0, 0);
-  const rc = state.recentClosed || [];
+  // state.todayClosed (scan ≥ 11/11 20h) est complet ; sinon repli sur recentClosed, tronqué à 40 trades labo compris.
+  const full = Array.isArray(state.todayClosed);
+  const rc = full ? state.todayClosed : state.recentClosed || [];
   const today = rc.filter((t) => t.status !== 'shadow' && t.closeTime >= +day0);
   const doneR = today.reduce((a, t) => a + (t.resultR || 0) * riskMult(t), 0);
-  const partial = rc.length > 0 && Math.min(...rc.map((t) => t.closeTime)) >= +day0; // historique tronqué : au moins ce montant
+  const partial = !full && rc.length > 0 && Math.min(...rc.map((t) => t.closeTime)) >= +day0; // historique tronqué : au moins ce montant
   if (!ts.length && !today.length) return '';
   const usdR = risk.capital * risk.risk / 100;
   const limPct = risk.daily > 0 ? risk.daily : risk.dd;
