@@ -138,7 +138,7 @@ function notifyNew(first) {
   if (first || !alertsOn || !fresh.length) return;
   beep();
   if ('Notification' in window && Notification.permission === 'granted') {
-    for (const s of fresh.slice(0, 3)) new Notification(`${s.side === 'long' ? '🟢 LONG' : '🔴 SHORT'} ${sym(s.symbol)} · score ${s.score}`, { body: `${s.label} — entrée ${px(s.entry)} / stop ${px(s.sl)}` });
+    for (const s of fresh.slice(0, 3)) new Notification(`${s.side === 'long' ? '🟢 LONG' : '🔴 SHORT'} ${sym(s.symbol)}`, { body: `${s.label} — entrée ${px(s.entry)} / stop ${px(s.sl)}` });
   }
   document.title = `(${fresh.length}) TARGETOP · Radar crypto`;
   setTimeout(() => (document.title = 'TARGETOP · Radar crypto'), 60e3);
@@ -185,7 +185,8 @@ function sizing(s, price) {
 // Un trade radar est-il déjà ouvert sur cet actif ? (évite de doubler la position ou de se contredire)
 function already(s) {
   if (s.status === 'shadow') return '';
-  const t = (state.openTrades || []).find((x) => x.status !== 'shadow' && x.symbol === s.symbol);
+  const mine = (state.openTrades || []).filter((x) => x.status !== 'shadow' && x.symbol === s.symbol);
+  const t = mine.find((x) => x.side === s.side) || mine[0]; // même sens en priorité
   if (!t) return '';
   if (t.side !== s.side) return `<div><span class="tag bad">⚠️ Un trade ${t.side === 'long' ? 'LONG' : 'SHORT'} est déjà ouvert sur ${esc(sym(s.symbol))} : signal contradictoire, abstiens-toi</span></div>`;
   const same = t.signalBarTime === s.barTime;
@@ -200,7 +201,7 @@ function card(s, compact) {
   const node = el(`<div class="card ${s.side} ${st.stale ? 'stale' : ''}" data-key="${esc(sigKey(s))}">
     <div class="card-head">
       <div><span class="side ${s.side}">${s.side === 'long' ? 'LONG' : 'SHORT'}</span><span class="sym">${esc(sym(s.symbol))}</span></div>
-      <div><span class="score ${s.score >= 75 ? 'a' : ''}" title="Score qualité 0-100">${s.score}</span></div>
+      <div><span class="score" title="Score de setup (0-100) : non calibré, il ne prédit pas le résultat (test 180 j). À ne pas utiliser pour choisir.">score ${s.score}</span></div>
     </div>
     <div class="sub">${esc(s.label || s.strategy)} · ${esc(s.tf || '15m')} · v${s.version} · signal ${ago(s.closeTime)}</div>
     <div class="levels">
@@ -232,16 +233,19 @@ function renderSignals() {
   const box = $('signals'); box.innerHTML = '';
   if (!liveSigs.length) box.appendChild(el(`<div class="empty">Aucune opportunité validée en ce moment. Le radar scanne ${state.universeSize} perpétuels toutes les ~10 min.<br>Pas de signal = pas de trade : c'est aussi une décision.</div>`));
   const nL = liveSigs.filter((s) => s.side === 'long').length, nS = liveSigs.length - nL;
-  if (Math.max(nL, nS) >= 3) box.appendChild(el(`<div class="empty" style="grid-column:1/-1;text-align:left">⚠ ${Math.max(nL, nS)} signaux ${nS > nL ? 'SHORT' : 'LONG'} en même temps : ils sont très corrélés au BTC. Ne prends pas tout : choisis les 1 à 2 meilleurs scores (le paper-trading en ouvre au plus ${state.settings?.maxSameSideLiveSignals ?? 4} dans le même sens).</div>`));
+  if (Math.max(nL, nS) >= 3) box.appendChild(el(`<div class="empty" style="grid-column:1/-1;text-align:left">⚠ ${Math.max(nL, nS)} signaux ${nS > nL ? 'SHORT' : 'LONG'} en même temps : ils sont très corrélés au BTC. Ne prends pas tout : choisis-en 1 ou 2, en priorité ceux affichés en premier (stratégie au meilleur historique live, signal le plus récent) (le paper-trading en ouvre au plus ${state.settings?.maxSameSideLiveSignals ?? 4} dans le même sens).</div>`));
   // Beaucoup de signaux en même temps = mêmes idées très corrélées : on met en avant les 3 meilleurs
   // (hors actifs déjà en cours) et on replie le reste pour ne pas pousser à tout prendre.
   const isOpen = (s) => (state.openTrades || []).some((t) => t.status !== 'shadow' && t.symbol === s.symbol);
-  const ranked = liveSigs.slice().sort((a, b) => isOpen(a) - isOpen(b) || b.score - a.score);
+  // Le score ne prédit pas le résultat (calibration 180 j, STRATEGY_LOG 11/11 09h30) : on classe par
+  // historique live de la stratégie (espérance nette), puis par fraîcheur du signal.
+  const edge = (s) => { const st = state.stats?.byStrategy?.[s.strategy]; return st?.trades ? st.expectancyR : 0; };
+  const ranked = liveSigs.slice().sort((a, b) => isOpen(a) - isOpen(b) || edge(b) - edge(a) || (b.closeTime || 0) - (a.closeTime || 0));
   const TOP = 3;
   if (ranked.length <= TOP + 1) ranked.forEach((s) => box.appendChild(card(s)));
   else {
     ranked.slice(0, TOP).forEach((s) => box.appendChild(card(s)));
-    const more = el(`<details id="more-sigs" class="panel" style="grid-column:1/-1"${wasOpen ? ' open' : ''}><summary>Voir les ${ranked.length - TOP} autres signaux <span class="muted">(scores plus faibles ou actif déjà en cours : à éviter si tu as déjà tes positions)</span></summary><div class="cards"></div></details>`);
+    const more = el(`<details id="more-sigs" class="panel" style="grid-column:1/-1"${wasOpen ? ' open' : ''}><summary>Voir les ${ranked.length - TOP} autres signaux <span class="muted">(stratégie moins prouvée en live, signal plus ancien ou actif déjà en cours : à éviter si tu as déjà tes positions)</span></summary><div class="cards"></div></details>`);
     ranked.slice(TOP).forEach((s) => more.querySelector('.cards').appendChild(card(s, true)));
     box.appendChild(more);
   }
