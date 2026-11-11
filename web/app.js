@@ -228,11 +228,23 @@ function renderSignals() {
   const lab = sigs.filter((s) => s.status === 'shadow');
   $('sig-count').textContent = liveSigs.length ? `${liveSigs.length} active(s)` : '';
   $('lab-count').textContent = `(${lab.length})`;
+  const wasOpen = !!document.querySelector('#more-sigs[open]'); // garder le tiroir ouvert au rafraîchissement
   const box = $('signals'); box.innerHTML = '';
   if (!liveSigs.length) box.appendChild(el(`<div class="empty">Aucune opportunité validée en ce moment. Le radar scanne ${state.universeSize} perpétuels toutes les ~10 min.<br>Pas de signal = pas de trade : c'est aussi une décision.</div>`));
   const nL = liveSigs.filter((s) => s.side === 'long').length, nS = liveSigs.length - nL;
   if (Math.max(nL, nS) >= 3) box.appendChild(el(`<div class="empty" style="grid-column:1/-1;text-align:left">⚠ ${Math.max(nL, nS)} signaux ${nS > nL ? 'SHORT' : 'LONG'} en même temps : ils sont très corrélés au BTC. Ne prends pas tout : choisis les 1 à 2 meilleurs scores (le paper-trading en ouvre au plus ${state.settings?.maxSameSideLiveSignals ?? 4} dans le même sens).</div>`));
-  liveSigs.forEach((s) => box.appendChild(card(s)));
+  // Beaucoup de signaux en même temps = mêmes idées très corrélées : on met en avant les 3 meilleurs
+  // (hors actifs déjà en cours) et on replie le reste pour ne pas pousser à tout prendre.
+  const isOpen = (s) => (state.openTrades || []).some((t) => t.status !== 'shadow' && t.symbol === s.symbol);
+  const ranked = liveSigs.slice().sort((a, b) => isOpen(a) - isOpen(b) || b.score - a.score);
+  const TOP = 3;
+  if (ranked.length <= TOP + 1) ranked.forEach((s) => box.appendChild(card(s)));
+  else {
+    ranked.slice(0, TOP).forEach((s) => box.appendChild(card(s)));
+    const more = el(`<details id="more-sigs" class="panel" style="grid-column:1/-1"${wasOpen ? ' open' : ''}><summary>Voir les ${ranked.length - TOP} autres signaux <span class="muted">(scores plus faibles ou actif déjà en cours : à éviter si tu as déjà tes positions)</span></summary><div class="cards"></div></details>`);
+    ranked.slice(TOP).forEach((s) => more.querySelector('.cards').appendChild(card(s, true)));
+    box.appendChild(more);
+  }
   const lb = $('lab'); lb.innerHTML = '';
   if (!lab.length) lb.appendChild(el('<div class="empty">Rien dans le labo pour l\'instant.</div>'));
   lab.forEach((s) => lb.appendChild(card(s, true)));
