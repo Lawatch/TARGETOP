@@ -27,7 +27,7 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [x] P2 Tableau Performance : lisible sur mobile (statut sous le nom, colonnes secondaires masquées < 600 px), stratégies du radar en tête puis tri par total R, PF au format français (produit, 10/11 20h).
 - [x] P1 Ligne « risque engagé » sous les trades radar : pire cas si tous les stops sont touchés (R, $, % de la perte max jour/totale) + alerte quand tous les trades sont dans le même sens (produit, 10/11 23h).
 - [x] P1 Carte d'opportunité : tag « 📈 Déjà en cours » si un trade radar est ouvert sur l'actif (ou ⚠️ si sens opposé), pour ne pas doubler la position. Correctifs : cases niveaux qui débordaient avec les micro-prix (PEPE), levier « 0.0x » → « <0.1x » (produit, 11/11 02h).
-- [ ] P2 Mobile : dans « Paper-trading en cours », la colonne « R live » n'est visible qu'en faisant défiler le tableau ; masquer TP2/Entrée sous 600 px comme le tableau Performance.
+- [x] P2 Mobile : « Paper-trading en cours » tient dans l'écran (Actif ▲/▼, Stop, Prix, R live ; colonnes secondaires masquées < 600 px), vérifié iPhone 13 et SE (produit, 11/11 05h).
 - [ ] P3 Mobile : la page est très longue (Radar marché = 4 tableaux empilés) ; envisager de replier le Radar marché par défaut sur mobile.
 - [ ] P3 Mobile : les libellés « Stop +0,96 % » / « TP2 −7,70 % » passent sur 2 lignes dans les cases niveaux (raccourcir ou réduire la police).
 - [ ] P3 Mode « pré-alerte » : setup en formation (pas encore validé).
