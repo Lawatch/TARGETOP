@@ -22,10 +22,10 @@
 - **Radar (net, id@version)** : 10 clos, **+4,06R**. `trend_pullback@1` 9 trades, 7 gagnants, **+5,09R** (depuis 02h : FET stop −1,03R, XBT +0,52R en TP1 puis breakeven) ; `failed_breakout@1` −1,03R. **Pire jour : 11/11 à −1,55R** (limite −6R ✅), 5 trades radar ouverts (4 short).
 - **Alerte Stratège** : le labo continue de saigner le 11/11 : **10 clos, −10,58R**, dont `trend_pullback_btc` **0/6 (−6,39R)**, qui fait pire que `trend_pullback` sans filtre (7/9). Le filtre BTC 4h ne tient pas en live pour l'instant (n petit). 33 shorts sur 35 trades labo ouverts. La règle de portefeuille P0 (max 3 dans le même sens, stop journée à −3R) aurait limité la casse : elle attend la validation de l'utilisateur.
 
-## 🧠 Stratège · 2026-11-11 03h30 UTC
-- **Live** : radar +4,58R net cumulé. Le rebond de la nuit a donné 8 stops short (labo `trend_pullback_btc` 0/4). Aucune stratégie n'a 15 trades : pas de promotion ni de coupe, et aucun paramètre modifié.
-- **Analyse de risque** (180 j) : prendre **tous** les signaux radar donne un pire jour à −25R et 57 jours sur 180 sous la limite de −6R, même −12,5R à demi-risque. Avec **max 3 positions dans le même sens + plus d'entrée après −3R réalisés dans la journée**, le pire jour tombe à −7R (−3,5R à demi-risque), pour une espérance quasi inchangée. Proposé en **P0** dans le backlog et le plan de lancement, **à valider par l'utilisateur**.
-- **Reco** : Produit → si l'utilisateur valide, afficher sur les cartes « plafond atteint, ne pas prendre ». Analyste → suivre chaque jour le pire cas en R contre la limite de −6R.
+## 🧠 Stratège · 2026-11-11 06h30 UTC
+- **Live** : radar +4,06R net (10 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe, aucun paramètre modifié.
+- **Diagnostic** `trend_pullback_btc` 0/6 contre `trend_pullback` 7/9 : **pas un échec du filtre**. Les 7 gains datent d'avant la création de la variante. Sur la même période, `trend_pullback` fait −1,54R sur 3 trades. De plus, 3 des 6 pertes de la variante (NEAR, ENA, XMR) n'ont aucun trade radar sur la période, signe qu'elles sont hors top 25. Les deux ont subi le même rebond.
+- **Reco** : Analyste → comparer une variante labo et sa stratégie radar sur la même période et le même top 25. Pour tous : la règle de portefeuille P0 (max 3 dans le même sens, stop journée à −3R) attend toujours la validation de l'utilisateur.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.

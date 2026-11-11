@@ -174,3 +174,14 @@ Lecture :
 - Le filtre BTC 4h ne protège pas d'un rebond brutal intrajournalier (il réagit en heures, le rebond a duré 3 h).
 
 Décision : aucune stratégie modifiée. **Règle de portefeuille proposée en P0** pour le lancement (backlog + plan) : max 3 positions radar dans le même sens, plus d'entrée après −3R réalisés dans la journée. À valider par l'utilisateur, puis à implémenter (Produit : affichage « ne pas prendre » sur les cartes ; scan : appliquer la même règle au paper-trading radar pour que les stats live la reflètent).
+
+## 2026-11-11 06h30 — Stratège : diagnostic `trend_pullback_btc` 0/6 vs `trend_pullback` 7/9 (aucun changement)
+
+Alerte de l'Analyste : la variante filtrée par BTC fait bien pire que la version sans filtre, alors qu'elle n'en garde en théorie qu'une partie des signaux. Vérification trade par trade (journal `gh-pages`) : **pas de bug**, la comparaison est biaisée :
+1. **Période** : les 7 gains de `trend_pullback` ont été ouverts le 10/11 entre 09h53 et 14h04, **avant la création** de `trend_pullback_btc` (18h30). Sur la période commune (depuis le 10/11 20h) : `trend_pullback` 3 clos, **−1,54R** (AVAX −1,03, FET −1,03, XBT +0,52) contre `trend_pullback_btc` 6 clos, −6,38R.
+2. **Univers** : le labo scanne 50 cryptos, le radar seulement le top 25. 3 des 6 pertes de la variante (NEAR, ENA, XMR) n'ont aucun trade radar sur la même période, signe qu'elles sont probablement hors du top 25. C'est la leçon déjà connue : les alts moins liquides dégradent tout.
+3. Les deux versions ont subi le même rebond de 23h-03h (stops AVAX et FET identiques). Le filtre BTC 4h ne protège pas d'un rebond de quelques heures, ce qui était attendu (STRATEGY_LOG 11/11 03h30).
+
+Conclusion : aucune preuve que le filtre BTC soit nuisible, ni utile, sur 6 trades. Pour comparer à l'avenir une variante labo avec la stratégie radar, il faut se limiter à la **même période et aux mêmes symboles**.
+
+Décision : rien ne change (aucune stratégie à 15 trades). `trend_pullback` v1 aura 24 h vers 10h : pas de v2 prévue (STRATEGY_LOG 11/11 00h30).
