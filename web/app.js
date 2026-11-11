@@ -179,9 +179,18 @@ function sizing(s, price) {
   const notional = qty * entry;
   const lev = notional / risk.capital;
   const warn = lev > risk.lev ? ` <span class="neg">⚠ levier ${lev.toFixed(1)}x > max ${risk.lev}x : réduis à ${usd(risk.capital * risk.lev)} (risque ${usd(risk.capital * risk.lev / entry * dist)})</span>` : '';
-  return `Taille : <b>${qty >= 100 ? Math.round(qty).toLocaleString('fr-FR') : qty.toPrecision(3)} ${sym(s.symbol)}</b> ≈ ${usd(notional)} (levier ${lev.toFixed(1)}x) · risque ${usd(rUsd)}${riskMult(s) < 1 ? ' (½ risque : exploration)' : ''}${warn}`;
+  return `Taille : <b>${qty >= 100 ? Math.round(qty).toLocaleString('fr-FR') : qty.toPrecision(3)} ${sym(s.symbol)}</b> ≈ ${usd(notional)} (levier ${lev < 0.1 ? '<0.1' : lev.toFixed(1)}x) · risque ${usd(rUsd)}${riskMult(s) < 1 ? ' (½ risque : exploration)' : ''}${warn}`;
 }
 
+// Un trade radar est-il déjà ouvert sur cet actif ? (évite de doubler la position ou de se contredire)
+function already(s) {
+  if (s.status === 'shadow') return '';
+  const t = (state.openTrades || []).find((x) => x.status !== 'shadow' && x.symbol === s.symbol);
+  if (!t) return '';
+  if (t.side !== s.side) return `<div><span class="tag bad">⚠️ Un trade ${t.side === 'long' ? 'LONG' : 'SHORT'} est déjà ouvert sur ${esc(sym(s.symbol))} : signal contradictoire, abstiens-toi</span></div>`;
+  const same = t.signalBarTime === s.barTime;
+  return `<div><span class="tag info">📈 Déjà en cours (entrée ${px(t.entry)}, ${ago(t.openTime)})${same ? '' : ' : ne double pas la position'}</span></div>`;
+}
 function card(s, compact) {
   const price = live[s.symbol] ?? s.price;
   const st = liveStatus(s, price);
@@ -202,6 +211,7 @@ function card(s, compact) {
     </div>
     <div class="live"><span>Prix : <b class="lp">${px(price)}</b> <span class="lpd ${cls(dir * (price - s.entry))}">${price ? pct(((price - s.entry) / s.entry) * 100) : ''}</span></span><span class="tag ${st.cls} lst">${esc(st.txt)}</span></div>
     <div><span class="tag ${rel.cls}">${esc(rel.txt)}</span></div>
+    ${already(s)}
     ${compact ? '' : `<ul class="reasons">${(s.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`}
     <div class="size"><button class="copy">copier</button>${sizing(s, price)}</div>
   </div>`);
