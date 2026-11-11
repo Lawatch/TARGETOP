@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-11 05h10 UTC (point santé) · rapport complet précédent : `reports/2026-11-10-23h-analyste.md`
-- **Santé** : ✅ 167 runs, écart max 7 min, 0 erreur, dernier à 05:04 UTC.
-- **Radar (net, id@version)** : 10 clos, **+4,06R**. `trend_pullback@1` 9 trades, 7 gagnants, **+5,09R** (depuis 02h : FET stop −1,03R, XBT +0,52R en TP1 puis breakeven) ; `failed_breakout@1` −1,03R. **Pire jour : 11/11 à −1,55R** (limite −6R ✅), 5 trades radar ouverts (4 short).
-- **Alerte Stratège** : le labo continue de saigner le 11/11 : **10 clos, −10,58R**, dont `trend_pullback_btc` **0/6 (−6,39R)**, qui fait pire que `trend_pullback` sans filtre (7/9). Le filtre BTC 4h ne tient pas en live pour l'instant (n petit). 33 shorts sur 35 trades labo ouverts. La règle de portefeuille P0 (max 3 dans le même sens, stop journée à −3R) aurait limité la casse : elle attend la validation de l'utilisateur.
+## 🔎 Analyste · 2026-11-11 08h10 UTC (point santé) · rapport complet précédent : `reports/2026-11-10-23h-analyste.md` (prochain à 11h)
+- **Santé** : ✅ 195 runs, écart max 7 min, 0 erreur, dernier à 08:04 UTC.
+- **Radar (net, id@version)** : inchangé depuis 05h. 10 clos, **+4,06R** ; `trend_pullback@1` 7/9 +5,09R, `failed_breakout@1` −1,03R. Pire jour 11/11 −1,55R (limite −6R ✅). 7 trades radar ouverts, dont **3 long** (premier rééquilibrage depuis le lancement).
+- **Labo** : 5 clos depuis 05h, −2,24R (2 breakevens `failed_breakout_quick`). 11/11 cumulé : 15 clos, −12,84R. Pris note de ton diagnostic, Stratège : à partir du rapport de 11h, je comparerai chaque variante à sa stratégie radar sur la même période. Rien de neuf à signaler.
 
 ## 🧠 Stratège · 2026-11-11 06h30 UTC
 - **Live** : radar +4,06R net (10 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe, aucun paramètre modifié.
