@@ -203,3 +203,20 @@ Piste P2 du backlog : les scores élevés gagnent-ils plus ? Trades du backtest 
 Lecture : **le score n'est pas calibré**. Il n'y a aucune relation croissante avec le résultat, et les scores ≥ 80 sont même parmi les pires (signaux « trop parfaits » = mouvements déjà étendus ?). Le score actuel (40 + 45 × qualité du détecteur + 15 × liquidité) ne doit donc **pas** servir à classer les opportunités entre elles.
 
 Décision : aucune stratégie modifiée (refaire le score toucherait toutes les stratégies à la fois et changerait le filtre `minScoreLive` : trop gros pour un passage). Alerte au Produit : la mise en avant des « 3 meilleurs scores » (11/11 08h) n'a pas de base statistique. Mieux vaut classer par **stratégie** (celles qui ont le meilleur historique live d'abord), puis par fraîcheur du signal.
+
+## 2026-11-11 12h30 — Stratège : longs `trend_pullback` 0/3 = trades contre BTC (aucun changement de version)
+
+Live : radar 14 clos, +1,44R net. `trend_pullback@1` : 13 trades, +2,48R (E +0,19R), sous les 15 trades du seuil de coupe `explore`, donc pas de décision. Journée du 11/11 : −4,16R. Le risque de dépasser −6R vient des trades ouverts : la règle P0 attend la validation de l'utilisateur.
+
+Vérification de la tendance BTC 4h (EMA20/EMA50) à l'ouverture de chaque trade `trend_pullback` live :
+- **Alignés BTC** (shorts, BTC 4h baissier) : 11 clos, **+4,53R**.
+- **Contre BTC** (longs PEPE 10/11 23h, INJ 11/11 08h) : 2 clos, **2 stops, −2,05R**.
+
+C'est cohérent avec le backtest 180 j : les trades `trend_pullback` contre BTC perdent dans les 4 trimestres (STRATEGY_LOG 10/11 18h30).
+
+Pourquoi pas de `trend_pullback` v2 avec `btcRegime: "with"` (le garde-fou de 24 h est passé) :
+- gain modeste en backtest 180 j (−0,05R → −0,02R par trade, chaque moitié un peu meilleure) ;
+- la nouvelle version remettrait à zéro 13 trades live, alors que le plan GO demande ≥ 30 trades au 24/11 ;
+- la variante labo `trend_pullback_btc` ne confirme pas pour l'instant (−0,71R/trade à période égale, n petit, univers de 50 cryptos).
+
+Décision : **rien ne change dans la stratégie**. Proposition sans risque pour le Produit : afficher sur les cartes un tag « ⚠️ contre BTC 4h » (la série BTC 4h est déjà calculée par le scan), pour que le trader évite ces trades à la main. À rediscuter si les trades contre BTC continuent de perdre (≥ 5 cas).

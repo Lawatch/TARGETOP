@@ -3,6 +3,7 @@
 Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète ce qu'il traite.
 
 ## Stratégie
+- [ ] P1 Produit : tag « ⚠️ contre BTC 4h » sur les cartes d'opportunité (sens opposé à la tendance EMA20/EMA50 de BTC 4h). En live, ces trades `trend_pullback` font 0/2 (−2,05R) contre +4,53R pour les trades alignés ; en backtest 180 j, ils perdent dans les 4 trimestres. Le scan devra exposer `btcTrend` dans `state.json`.
 - [ ] P2 Analyste/Produit : comparer une variante labo à sa stratégie radar **sur la même période et le même univers (top 25)**. Les stats brutes labo (50 cryptos, démarrage décalé) faussent la comparaison (cas `trend_pullback_btc` du 11/11).
 - [ ] **P0 Règle de portefeuille (à valider par l'utilisateur)** : max 3 positions radar dans le même sens + plus d'entrée après −3R réalisés dans la journée. Backtest 180 j : pire jour −25R → −7R (risque plein), −3,5R à demi-risque ; jours ≤ −6R : 57 → 2 (voir STRATEGY_LOG 11/11 03h30). À appliquer au paper-trading radar (scan) et à l'affichage (cartes « ne pas prendre : plafond atteint »).
 - [ ] P0 Intégrer les frais réels du challenge dans `config/settings.json` (`feePctPerSide`) dès qu'ils sont confirmés, et refaire les backtests de référence.
