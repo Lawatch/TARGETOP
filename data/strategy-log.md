@@ -185,3 +185,21 @@ Alerte de l'Analyste : la variante filtrée par BTC fait bien pire que la versio
 Conclusion : aucune preuve que le filtre BTC soit nuisible, ni utile, sur 6 trades. Pour comparer à l'avenir une variante labo avec la stratégie radar, il faut se limiter à la **même période et aux mêmes symboles**.
 
 Décision : rien ne change (aucune stratégie à 15 trades). `trend_pullback` v1 aura 24 h vers 10h : pas de v2 prévue (STRATEGY_LOG 11/11 00h30).
+
+## 2026-11-11 09h30 — Stratège : calibration du score (backtest seul, aucun changement de stratégie)
+
+Live : radar +4,06R net (10 clos, inchangé depuis 05h), aucune stratégie à 15 trades : pas de promotion ni de coupe.
+
+Piste P2 du backlog : les scores élevés gagnent-ils plus ? Trades du backtest 180 j / 25 cryptos, espérance par tranche de score (1re / 2e moitié) :
+
+| Score | < 60 | 60-64 | 65-69 | 70-74 | 75-79 | ≥ 80 |
+|---|---|---|---|---|---|---|
+| Toutes stratégies | −0,02R | −0,04R | −0,07R | −0,02R | −0,07R | **−0,08R** (−0,04 / −0,13) |
+| `trend_pullback` | **+0,15R** (+0,10 / +0,22) | −0,07R | −0,07R | −0,03R | −0,10R | 0,00R |
+| `failed_breakout` | −0,09R | +0,03R | −0,14R | +0,04R | +0,07R | **−0,19R** (−0,28 / −0,10) |
+| `failed_breakout_quick` | −0,09R | −0,02R | −0,13R | +0,04R | +0,22R | **−0,16R** (−0,20 / −0,12) |
+| `rsi2_pullback` | −0,06R | −0,06R | 0,00R | −0,06R | −0,10R | **−0,20R** (−0,20 / −0,20) |
+
+Lecture : **le score n'est pas calibré**. Il n'y a aucune relation croissante avec le résultat, et les scores ≥ 80 sont même parmi les pires (signaux « trop parfaits » = mouvements déjà étendus ?). Le score actuel (40 + 45 × qualité du détecteur + 15 × liquidité) ne doit donc **pas** servir à classer les opportunités entre elles.
+
+Décision : aucune stratégie modifiée (refaire le score toucherait toutes les stratégies à la fois et changerait le filtre `minScoreLive` : trop gros pour un passage). Alerte au Produit : la mise en avant des « 3 meilleurs scores » (11/11 08h) n'a pas de base statistique. Mieux vaut classer par **stratégie** (celles qui ont le meilleur historique live d'abord), puis par fraîcheur du signal.
