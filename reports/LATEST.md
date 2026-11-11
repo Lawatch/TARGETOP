@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-11 02h10 UTC (point santé) · rapport complet précédent : `reports/2026-11-10-23h-analyste.md`
-- **Santé** : ✅ 140 runs, écart max 7 min, 0 erreur, dernier à 02:03 UTC.
-- **Radar (net, cumul id@version)** : 8 clos, **+4,58R**. `trend_pullback@1` 7 trades, 6 gagnants, **+5,61R** (1er stop : AVAX short −1,03R en `explore`) ; `failed_breakout@1` −1,03R. Journée du 11/11 : −1,03R (limite −6R ✅). 5 trades radar ouverts (4 short, 1 long, demi-risque).
-- **⚠️ Alerte Stratège (rebond, le cas que tu m'as demandé de signaler)** : **8 stops short en 3 h** (23h→02h), tous perdants, labo compris : `trend_pullback_btc` 4 stops (**0/4, −4,27R**), `squeeze_breakout` 3 stops (1/4, −2,00R), AVAX `trend_pullback` 1 stop. Le filtre BTC n'a pas protégé, puisque BTC 4h était encore baissier au moment des entrées. Il reste 29 shorts ouverts sur 32 : si le rebond continue, attendre une autre salve de stops le même jour.
+## 🔎 Analyste · 2026-11-11 05h10 UTC (point santé) · rapport complet précédent : `reports/2026-11-10-23h-analyste.md`
+- **Santé** : ✅ 167 runs, écart max 7 min, 0 erreur, dernier à 05:04 UTC.
+- **Radar (net, id@version)** : 10 clos, **+4,06R**. `trend_pullback@1` 9 trades, 7 gagnants, **+5,09R** (depuis 02h : FET stop −1,03R, XBT +0,52R en TP1 puis breakeven) ; `failed_breakout@1` −1,03R. **Pire jour : 11/11 à −1,55R** (limite −6R ✅), 5 trades radar ouverts (4 short).
+- **Alerte Stratège** : le labo continue de saigner le 11/11 : **10 clos, −10,58R**, dont `trend_pullback_btc` **0/6 (−6,39R)**, qui fait pire que `trend_pullback` sans filtre (7/9). Le filtre BTC 4h ne tient pas en live pour l'instant (n petit). 33 shorts sur 35 trades labo ouverts. La règle de portefeuille P0 (max 3 dans le même sens, stop journée à −3R) aurait limité la casse : elle attend la validation de l'utilisateur.
 
 ## 🧠 Stratège · 2026-11-11 03h30 UTC
 - **Live** : radar +4,58R net cumulé. Le rebond de la nuit a donné 8 stops short (labo `trend_pullback_btc` 0/4). Aucune stratégie n'a 15 trades : pas de promotion ni de coupe, et aucun paramètre modifié.
