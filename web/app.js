@@ -267,6 +267,8 @@ function tradeR(t) {
 
 // Journée du challenge (UTC) : réalisé du jour + pire cas si tous les stops ouverts sont touchés,
 // en R de ton compte (exploration = ½ risque), comparé à la perte max jour (Prop) ou totale (Funded).
+// Trade radar ouvert dans l'autre sens sur le même actif (ex. ZEC long + ZEC short) ?
+const opposite = (t) => (state.openTrades || []).some((x) => x.status !== 'shadow' && x.symbol === t.symbol && x.side !== t.side);
 function riskLine(ts) {
   const atStop = (t) => { const dir = t.side === 'long' ? 1 : -1; return (t.realizedR + t.remaining * (dir * (t.sl - t.entry)) / t.risk - t.feeR) * riskMult(t); };
   const openR = ts.reduce((a, t) => a + atStop(t), 0);
@@ -292,7 +294,9 @@ function riskLine(ts) {
   const verdict = worst >= 0 ? 'aucune perte possible sur la journée.'
     : `pire fin de journée <b>${r2(worst)}</b> (${usd(worst * usdR)}), soit <b>${Math.round(share * 100)} %</b> de ta ${limName} (${limPct} %).`
       + (limPct > 0 && -doneR * usdR >= risk.capital * limPct / 100 ? ' ⛔ Limite déjà atteinte par les trades clos : n\'ouvre plus rien aujourd\'hui.' : share >= 1 ? ' ⛔ Tu peux dépasser ta limite : n\'ouvre plus rien aujourd\'hui.' : share >= 0.67 ? ' Évite d\'ouvrir de nouvelles positions aujourd\'hui.' : '');
-  return `<div class="riskline ${c}">🛡️ Aujourd'hui (UTC) : ${parts.join(' · ')} → ${verdict}${corr}</div>`;
+  const clashes = [...new Set(ts.filter(opposite).map((t) => sym(t.symbol)))];
+  const clashTxt = clashes.length ? `<br>⇄ ${clashes.map(esc).join(', ')} : un LONG et un SHORT sont ouverts en même temps. En réel, ne garde qu'un sens : les deux s'annulent et paient deux fois les frais.` : '';
+  return `<div class="riskline ${c}">🛡️ Aujourd'hui (UTC) : ${parts.join(' · ')} → ${verdict}${corr}${clashTxt}</div>`;
 }
 
 function renderOpen() {
@@ -302,7 +306,8 @@ function renderOpen() {
   $('open-count').textContent = all.length ? `(${radar.length} radar${lab.length ? ` · ${lab.length} labo` : ''})` : '';
   const table = (ts) => `<div class="tablewrap"><table class="opent"><thead><tr><th>Actif</th><th class="opt">Sens</th><th class="opt">Stratégie</th><th class="opt">Entrée</th><th>Stop</th><th class="opt">TP1</th><th class="opt">TP2</th><th>Prix</th><th>R live</th><th class="opt">Depuis</th></tr></thead><tbody>${ts.map((t) => {
     const r = tradeR(t);
-    return `<tr data-sym="${esc(t.symbol)}" data-id="${esc(t.id)}"><td><b>${esc(sym(t.symbol))}</b> <span class="mside ${t.side}">${t.side === 'long' ? '▲ L' : '▼ S'}</span></td><td class="opt"><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td class="opt">${esc(t.strategy)} ${t.status === 'shadow' ? '<span class="tag">labo</span>' : t.status === 'explore' ? '<span class="tag warn">🧪</span>' : ''}</td><td class="opt">${px(t.entry)}</td><td>${px(t.sl)}${t.tp1Hit ? ' <span class="tag ok">BE</span>' : ''}</td><td class="opt">${px(t.tp1)}</td><td class="opt">${px(t.tp2)}</td><td class="lp">${px(live[t.symbol] ?? t.price)}</td><td class="lr ${cls(r)}"><b>${r2(r)}</b></td><td class="opt">${ago(t.openTime)}</td></tr>`;
+    const clash = t.status !== 'shadow' && opposite(t);
+    return `<tr data-sym="${esc(t.symbol)}" data-id="${esc(t.id)}"${clash ? ' class="clash"' : ''}><td><b>${esc(sym(t.symbol))}</b>${clash ? ' <span class="tag bad" title="Un trade radar de sens opposé est ouvert sur le même actif">⇄</span>' : ''} <span class="mside ${t.side}">${t.side === 'long' ? '▲ L' : '▼ S'}</span></td><td class="opt"><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td class="opt">${esc(t.strategy)} ${t.status === 'shadow' ? '<span class="tag">labo</span>' : t.status === 'explore' ? '<span class="tag warn">🧪</span>' : ''}</td><td class="opt">${px(t.entry)}</td><td>${px(t.sl)}${t.tp1Hit ? ' <span class="tag ok">BE</span>' : ''}</td><td class="opt">${px(t.tp1)}</td><td class="opt">${px(t.tp2)}</td><td class="lp">${px(live[t.symbol] ?? t.price)}</td><td class="lr ${cls(r)}"><b>${r2(r)}</b></td><td class="opt">${ago(t.openTime)}</td></tr>`;
   }).join('')}</tbody></table></div>`;
   const wasOpen = !!document.querySelector('#open details[open]'); // garder le tiroir ouvert au rafraîchissement
   const labR = lab.reduce((a, t) => a + (tradeR(t) || 0), 0);
@@ -372,8 +377,9 @@ const STALE_MS = 30 * 60e3; // au-delà, les données sont considérées en reta
 function renderHeader() {
   const age = Date.now() - state.generatedAt;
   const p = $('pill-scan');
-  p.className = 'pill ' + (age < 25 * 60e3 ? 'ok' : age < 90 * 60e3 ? 'warn' : 'bad');
-  p.textContent = `Scan ${ago(state.generatedAt)} · ${state.universeSize} actifs`;
+  const degraded = !state.universeSize || state.errors?.length > 0; // scan passé mais incomplet (API Kraken vide, erreurs)
+  p.className = 'pill ' + (age >= 90 * 60e3 ? 'bad' : age >= 25 * 60e3 || degraded ? 'warn' : 'ok');
+  p.textContent = `Scan ${ago(state.generatedAt)} · ` + (state.universeSize ? `${state.universeSize} actifs` : '⚠️ incomplet (0 actif)') + (state.universeSize && state.errors?.length ? ` · ⚠️ ${state.errors.length} erreur(s)` : '');
   p.title = state.errors?.length ? 'Erreurs : ' + state.errors.join(' | ') : 'Dernier scan sans erreur';
   // Bandeau explicite si le scan est en retard : les signaux affichés peuvent être périmés.
   const bn = $('stale-banner');

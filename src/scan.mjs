@@ -37,6 +37,9 @@ const byVol = [...perps].sort((a, b) => (b.volumeQuote || 0) - (a.volumeQuote ||
 const universe = byVol.filter((t) => (t.volumeQuote || 0) >= settings.universe.minVolumeQuoteUsd).slice(0, settings.universe.maxSymbols);
 for (const s of settings.universe.always) if (!universe.find((u) => u.symbol === s)) { const t = perps.find((p) => p.symbol === s); if (t) universe.push(t); }
 const tick = Object.fromEntries(perps.map((t) => [t.symbol, t]));
+// Garde-fou : le 11/11 à 22:43, Kraken a renvoyé des tickers inexploitables. Le scan a alors écrit un univers vide
+// sans aucune erreur, et le site affichait « 0 actifs » en vert. On le signale explicitement.
+if (!universe.length) errors.push(`Kraken : tickers vides ou illisibles (${tickers?.length ?? 0} reçus, 0 perp exploitable) : marché et nouveaux signaux non mis à jour sur ce scan`);
 // Seuls les plus liquides peuvent produire des signaux live ; le reste nourrit le labo (shadow).
 const liveSet = new Set([...universe.slice(0, settings.universe.liveMaxSymbols ?? universe.length).map((t) => t.symbol), ...settings.universe.always]);
 const priceOf = (sym) => tick[sym]?.last ?? tick[sym]?.markPrice;
