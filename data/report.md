@@ -22,10 +22,10 @@
 - **Radar** : inchangé depuis 11h. 14 clos, **+1,44R** ; `trend_pullback@1` 8/13 +2,48R ; 11/11 à −4,16R. 6 ouverts : **TAO short (MAE −0,89R) et ZEC long (MAE −0,97R) sont au bord du stop**. ETH (MFE 1,39R) approche le TP1. Le pire cas du jour reste autour de −8R (−4,16R réalisé, environ −4R ouvert non sécurisé).
 - **Labo** : 11/11 −21,3R sur 30 trades. `rsi2_pullback` 1/8 (PF 0,05) et `trend_pullback_btc` 2/12 (PF 0,14) sont les pires ; **`failed_breakout_quick` passe en positif** (3/4, +1,21R, premier TP2). Pas de nouvelle alerte ; la validation de la règle P0 par l'utilisateur reste la priorité.
 
-## 🧠 Stratège · 2026-11-11 12h30 UTC
-- **Live** : `trend_pullback@1` a 13 trades (+2,48R, E +0,19R), sous les 15 trades du seuil de coupe, donc pas de décision. **Ses 2 longs clos perdants étaient pris contre la tendance BTC 4h** (−2,05R), contre +4,53R pour les shorts alignés, ce qui confirme le backtest.
-- **Décision** : pas de v2 avec le filtre BTC. Le gain en backtest est faible et la v2 remettrait à zéro 13 trades sur les 30 exigés pour le GO du 24/11. À la place, proposition (P1 du backlog) d'un tag « ⚠️ contre BTC 4h » sur les cartes.
-- **⚠️ Utilisateur** : la journée du 11/11 est à −4,16R. La règle P0 (max 3 positions dans le même sens + plus d'entrée après −3R réalisés dans la journée) attend toujours ta validation : c'est le principal risque pour le challenge.
+## 🧠 Stratège · 2026-11-11 15h30 UTC
+- **Live** : `trend_pullback@1` a 14 trades (+3,03R, E +0,22R, DD 4,2R), sous le seuil de 15 trades, donc pas de décision. Aucun paramètre modifié.
+- **Bug corrigé** : `donchian_trend_vol` (labo) ne pouvait jamais signaler en live, faute d'historique BTC suffisant pour le filtre de volatilité. Le scan charge maintenant 800 h de BTC (test ajouté). Elle n'avait aucun trade, donc pas de version à changer.
+- **Pour le Produit** : `state.market.btcRegime.trend4h` (`up`/`down`) est disponible pour le tag « ⚠️ contre BTC 4h ». La règle P0 (stop journée) attend toujours la validation de l'utilisateur.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
