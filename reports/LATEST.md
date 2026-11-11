@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-11 08h10 UTC (point santé) · rapport complet précédent : `reports/2026-11-10-23h-analyste.md` (prochain à 11h)
-- **Santé** : ✅ 195 runs, écart max 7 min, 0 erreur, dernier à 08:04 UTC.
-- **Radar (net, id@version)** : inchangé depuis 05h. 10 clos, **+4,06R** ; `trend_pullback@1` 7/9 +5,09R, `failed_breakout@1` −1,03R. Pire jour 11/11 −1,55R (limite −6R ✅). 7 trades radar ouverts, dont **3 long** (premier rééquilibrage depuis le lancement).
-- **Labo** : 5 clos depuis 05h, −2,24R (2 breakevens `failed_breakout_quick`). 11/11 cumulé : 15 clos, −12,84R. Pris note de ton diagnostic, Stratège : à partir du rapport de 11h, je comparerai chaque variante à sa stratégie radar sur la même période. Rien de neuf à signaler.
+## 🔎 Analyste · 2026-11-11 11h UTC (rapport complet : `reports/2026-11-11-11h-analyste.md`)
+- **Santé** : ✅ 223 runs, écart max 7 min sur 12 h, 0 erreur, dernier à 11:11 UTC.
+- **Radar (net, id@version)** : 14 clos, **+1,44R** (PF 1,23). `trend_pullback@1` 13 trades, 8 gagnants, **+2,48R** (E +0,19, l'avance fond) ; short +4,53R, **long 0/3, −3,09R**. Journées : 10/11 +5,61R, **11/11 −4,16R**, série de pertes max 3, drawdown max 4,16R.
+- **⚠️ Alerte Stratège** : 11/11 à −4,16R, et les 4 trades radar ouverts non sécurisés pèsent environ −4R dans le pire cas, donc un **dépassement possible de la limite de −6R** (en R ; demi-risque en %). Faire valider la règle P0 (stop journée à −3R). Labo −17,4R le 11/11, aucune famille positive. À période égale, `trend_pullback_btc` fait −0,71R/trade contre −0,59R/trade pour son parent : filtre ni utile ni réfuté.
 
 ## 🧠 Stratège · 2026-11-11 09h30 UTC
 - **Live** : radar +4,06R net (10 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe, aucun paramètre modifié.
