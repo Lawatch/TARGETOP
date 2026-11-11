@@ -22,10 +22,10 @@
 - **Radar (net, cumul id@version)** : 8 clos, **+4,58R**. `trend_pullback@1` 7 trades, 6 gagnants, **+5,61R** (1er stop : AVAX short −1,03R en `explore`) ; `failed_breakout@1` −1,03R. Journée du 11/11 : −1,03R (limite −6R ✅). 5 trades radar ouverts (4 short, 1 long, demi-risque).
 - **⚠️ Alerte Stratège (rebond, le cas que tu m'as demandé de signaler)** : **8 stops short en 3 h** (23h→02h), tous perdants, labo compris : `trend_pullback_btc` 4 stops (**0/4, −4,27R**), `squeeze_breakout` 3 stops (1/4, −2,00R), AVAX `trend_pullback` 1 stop. Le filtre BTC n'a pas protégé, puisque BTC 4h était encore baissier au moment des entrées. Il reste 29 shorts ouverts sur 32 : si le rebond continue, attendre une autre salve de stops le même jour.
 
-## 🧠 Stratège · 2026-11-11 00h30 UTC
-- **Live** : radar +5,61R net (7 clos), aucune stratégie à 15 trades : pas de promotion ni de coupe. Statuts : les stats se cumulent par `id@version` (le passage `live` → `explore` ne change pas la version).
-- **Labo** : sorties de `trend_pullback` testées sur 180 j. Rapprocher le TP2 (3R ou 4R) ne change rien. Un stop suiveur de 1 ATR aide un peu : −0,06R → −0,02R, et +0,01R avec le filtre BTC. La stratégie reste sans avantage démontré sur 180 j, donc **aucune v2** : on ne remet pas à zéro ses 6/6 live pour un gain marginal.
-- **Reco** : Analyste → la concentration short du labo vient du régime BTC baissier, c'est attendu. Signaler si un rebond fait perdre plusieurs trades le même jour. Stratège (≥ 11/11 21h) → `donchian_trend` v2 (filtre de volatilité BTC) si le labo ne le dément pas.
+## 🧠 Stratège · 2026-11-11 03h30 UTC
+- **Live** : radar +4,58R net cumulé. Le rebond de la nuit a donné 8 stops short (labo `trend_pullback_btc` 0/4). Aucune stratégie n'a 15 trades : pas de promotion ni de coupe, et aucun paramètre modifié.
+- **Analyse de risque** (180 j) : prendre **tous** les signaux radar donne un pire jour à −25R et 57 jours sur 180 sous la limite de −6R, même −12,5R à demi-risque. Avec **max 3 positions dans le même sens + plus d'entrée après −3R réalisés dans la journée**, le pire jour tombe à −7R (−3,5R à demi-risque), pour une espérance quasi inchangée. Proposé en **P0** dans le backlog et le plan de lancement, **à valider par l'utilisateur**.
+- **Reco** : Produit → si l'utilisateur valide, afficher sur les cartes « plafond atteint, ne pas prendre ». Analyste → suivre chaque jour le pire cas en R contre la limite de −6R.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.

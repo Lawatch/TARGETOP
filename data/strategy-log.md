@@ -152,3 +152,25 @@ Lecture : la cible TP2 n'a aucun effet. Le suiveur 1 ATR protège mieux le gain 
 Décision : **rien ne change**. Une v2 remettrait à zéro les stats live (6/6) pour un gain marginal. Si `trend_pullback` doit avoir une v2 (après le 11/11 ~10h), la piste retenue est « filtre BTC + suiveur 1 ATR », à valider en labo d'abord.
 
 Réponse à l'Analyste sur les statuts : les stats se comptent par **`id@version`**. Passer de `live` à `explore` ne change pas la version, donc les trades `live` et `explore` d'une même version se cumulent (règle d'AGENTS.md).
+
+## 2026-11-11 03h30 — Stratège : risque corrélé et pire journée (analyse de portefeuille, aucun changement de stratégie)
+
+Contexte : un rebond entre 23h et 02h a déclenché 8 stops short en 3 h (`trend_pullback_btc` 0/4 −4,27R, `squeeze_breakout` −2R, AVAX `trend_pullback` −1R). Radar cumulé : +4,58R net. Aucune stratégie n'a 15 trades : pas de promotion ni de coupe.
+
+Question : quel est le vrai risque journalier du radar par rapport à la limite du challenge (−3 %/jour = **−6R** à 0,5 %/trade) ? Simulation sur les trades du backtest 180 j / 25 cryptos (`trend_pullback` + `failed_breakout` + `donchian_trend`), dans l'ordre chronologique, avec des règles de portefeuille :
+
+| Règle | Trades | Exp. (1re / 2e moitié) | Max DD | Pire jour | Jours ≤ −6R / 180 |
+|---|---|---|---|---|---|
+| Aucune (risque plein) | 3533 | −0,02R (−0,14 / +0,10) | 273R | **−25,0R** | **57** |
+| Stop jour −3R | 2556 | +0,01R (−0,16 / +0,14) | 187R | −17,3R | 32 |
+| Max 3 positions même sens | 1372 | −0,08R | 126R | −10,8R | 16 |
+| **Max 3 même sens + stop jour −3R** | 1223 | −0,05R (−0,16 / +0,07) | 113R | **−7,0R** | **2** |
+| Idem à demi-risque (`explore`) | 1223 | idem | 57R | **−3,5R** | **0** |
+| Aucune règle, demi-risque | 3533 | idem | 137R | −12,5R | 15 |
+
+Lecture :
+- **Prendre tous les signaux radar tuerait le challenge**, même à demi-risque (15 jours sous −6R en 180 j). Le danger, c'est la corrélation (tous les alts bougent avec BTC), pas une stratégie en particulier.
+- Plafond de positions et stop journalier **ne créent pas d'avantage** (l'espérance bouge peu) mais divisent le pire jour par 3 à 7. C'est une condition de survie, pas une optimisation.
+- Le filtre BTC 4h ne protège pas d'un rebond brutal intrajournalier (il réagit en heures, le rebond a duré 3 h).
+
+Décision : aucune stratégie modifiée. **Règle de portefeuille proposée en P0** pour le lancement (backlog + plan) : max 3 positions radar dans le même sens, plus d'entrée après −3R réalisés dans la journée. À valider par l'utilisateur, puis à implémenter (Produit : affichage « ne pas prendre » sur les cartes ; scan : appliquer la même règle au paper-trading radar pour que les stats live la reflètent).
