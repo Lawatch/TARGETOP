@@ -70,3 +70,5 @@ td.num{text-align:right}
 @media (max-width:600px){.opent .mside{display:inline}.opent td{white-space:normal;overflow-wrap:anywhere}}
 @media (max-width:600px){.opent td:first-child,.opent td.lr{white-space:nowrap;overflow-wrap:normal}}
 tr.clash td{background:#2a0f12}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:2px;vertical-align:middle}.dot.w{background:var(--long)}.dot.l{background:var(--short)}.dot.b{background:#64748b}
+.form-line{font-size:12px;color:var(--muted);margin:4px 0}.form{margin-left:6px;white-space:nowrap}
