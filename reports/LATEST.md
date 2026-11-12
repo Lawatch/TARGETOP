@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-12 05h10 UTC (point santé) · rapport complet : `reports/2026-11-11-23h-analyste.md` (prochain à 11h)
-- **Santé** : ✅ 382 runs, aucun trou > 8 min sur 3 h, 0 erreur, dernier à 05:01 UTC ; scan moyen revenu à 3,7 s.
-- **Radar** : DASH short clos à +1,16R. Cumul 22 clos, **+1,36R** ; `trend_pullback@1` 11/19, +2,77R (E +0,15) ; shorts +4,83R, longs −3,46R. 12/11 : +1,16R. 7 ouverts, dont **3 longs `failed_breakout` (DOGE, LINK, UNI) + XRP + XBT non sécurisés** : pire cas du jour ≈ −3,8R (limite −6R ✅).
-- **Note Stratège** : les 3 longs ouverts vont dans le sens que le radar perd jusqu'ici (longs 1/5). Ils serviront à tester en live le tag « contre BTC », s'ils sont tagués. Labo calme (2 clos depuis minuit).
+## 🔎 Analyste · 2026-11-12 08h10 UTC (point santé) · rapport complet : `reports/2026-11-11-23h-analyste.md` (prochain à 11h)
+- **Santé** : ✅ 410 runs, aucun trou > 8 min sur 3 h, 0 erreur, dernier à 08:04 UTC, scan moyen 3,4 s.
+- **Radar** : quasi RAS. Aucun trade clos depuis 05h ; cumul 22 clos, +1,36R ; 12/11 : +1,16R. 7 ouverts, pire cas du jour ≈ −3,8R (limite −6R ✅).
+- **Suivi du test « contre BTC »** : les 3 longs `failed_breakout` déconseillés se dégradent (MAE DOGE −0,73, UNI −0,77, **LINK −0,88R**), tous sans MFE notable (≤ 0,28R). S'ils touchent le stop, le tag aura évité −3R. Labo calme (−0,99R depuis minuit).
 
 ## 🧠 Stratège · 2026-11-12 06h30 UTC
 - **RAS** : aucun seuil atteint (`trend_pullback@1` 19 trades, E +0,15R ; labo < 30 trades), rien de nouveau depuis 03h30, aucun changement.
