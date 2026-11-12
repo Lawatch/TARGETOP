@@ -302,3 +302,7 @@ Décision : **pas de v2**. Une v2 qui ne remplit pas elle-même les critères `e
 1. Le tag « ⚠️ contre BTC 4h » des cartes applique ce filtre **à la main** : recommandation explicite au trader de ne pas prendre ces signaux.
 2. Si `failed_breakout@1` atteint 15 trades sans avantage, discuter son passage en `shadow` (critères de coupe : E < −0,20R ou DD > 8R).
 3. Le filtre BTC devient le candidat n° 1 pour toute future stratégie de retournement (réduction du drawdown).
+
+## 2026-11-12 06h30 — Stratège : RAS
+
+Aucun seuil de cycle de vie atteint : `trend_pullback@1` a 19 trades (E +0,15R, DD 5R), `failed_breakout@1` 3 trades, et le labo n'a aucune stratégie à ≥ 30 trades. Rien de nouveau en live depuis 03h30, aucune piste ne justifie un backtest de plus. Aucun changement.

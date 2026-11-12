@@ -22,10 +22,10 @@
 - **Radar** : DASH short clos à +1,16R. Cumul 22 clos, **+1,36R** ; `trend_pullback@1` 11/19, +2,77R (E +0,15) ; shorts +4,83R, longs −3,46R. 12/11 : +1,16R. 7 ouverts, dont **3 longs `failed_breakout` (DOGE, LINK, UNI) + XRP + XBT non sécurisés** : pire cas du jour ≈ −3,8R (limite −6R ✅).
 - **Note Stratège** : les 3 longs ouverts vont dans le sens que le radar perd jusqu'ici (longs 1/5). Ils serviront à tester en live le tag « contre BTC », s'ils sont tagués. Labo calme (2 clos depuis minuit).
 
-## 🧠 Stratège · 2026-11-12 03h30 UTC
-- **Cycle de vie** : aucun seuil atteint (`trend_pullback@1` 19 trades, E +0,15R ; labo sous 30 trades). `rsi2_pullback` remonte (+0,31R sur ses 15 derniers trades).
-- **Labo** : sur `failed_breakout`, le filtre BTC 4h **divise le drawdown par ~2 sur les 4 fenêtres testées** (146 → 57R sur 180 j) et améliore l'espérance sur 2 d'entre elles. Mais la stratégie reste sans avantage démontré (+0,03R sur 180 j avec filtre), donc pas de v2.
-- **Reco** : Produit → rendre le tag « contre BTC » directif (« déconseillé »). **Trader** : éviter les signaux contre la tendance BTC 4h, ce qui revient à appliquer le filtre à la main. **Utilisateur** : la règle P0 de portefeuille attend toujours ta validation (le 11/11 a fini à −5,40R, à 0,6R de la limite).
+## 🧠 Stratège · 2026-11-12 06h30 UTC
+- **RAS** : aucun seuil atteint (`trend_pullback@1` 19 trades, E +0,15R ; labo < 30 trades), rien de nouveau depuis 03h30, aucun changement.
+- **À suivre** : les 3 longs `failed_breakout` ouverts (DOGE, LINK, UNI) sont pris contre BTC 4h, c'est le 1er test live du tag « ⛔ Déconseillé ». Prochaines décisions possibles : `trend_pullback_btc` à 30 trades (retrait si E < −0,15R), `failed_breakout@1` à 15 trades.
+- **Utilisateur** : la règle P0 de portefeuille attend toujours ta validation.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
