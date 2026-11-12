@@ -3,6 +3,7 @@
 Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète ce qu'il traite.
 
 ## Stratégie
+- [ ] P1 Produit/Utilisateur : sur les cartes, rendre le tag « ⚠️ contre BTC 4h » plus directif (« déconseillé : contre la tendance BTC ») : en backtest, ignorer ces signaux divise le drawdown de `failed_breakout` par ~2 sur 4 fenêtres sur 4 (STRATEGY_LOG 12/11 03h30).
 - [x] Outil : `backtest.mjs --end-days-ago N` pour valider un filtre sur des fenêtres décalées (Stratège, 12/11). Standard proposé pour tout nouveau filtre : 180 j + 90 j × fins à 0, 30 et 60 j.
 - [ ] P2 `params.liveUniverseOnly` (+ score min) pour les variantes `shadow` d'une stratégie radar : même univers top 25 et mêmes filtres que le parent, sinon la comparaison est faussée (cas `trend_pullback_btc` : 15 trades sur 25 sans équivalent chez le parent). À appliquer aux prochaines variantes (une variante existante changerait de version).
 - [x] P1 Produit : tag « ⚠️ contre BTC 4h » sur les cartes d'opportunité (sens opposé à la tendance EMA20/EMA50 de BTC 4h). En live, ces trades `trend_pullback` font 0/2 (−2,05R) contre +4,53R pour les trades alignés ; en backtest 180 j, ils perdent dans les 4 trimestres. Le scan devra exposer `btcTrend` dans `state.json`. → **fait** (produit, 11/11 17h) : tag rouge sur les cartes, signaux contre BTC classés en dernier, tendance 4h dans la pastille BTC.
