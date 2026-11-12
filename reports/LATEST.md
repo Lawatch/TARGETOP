@@ -1,5 +1,8 @@
 # Rapport des agents
 
+## ⏸️ Projet mis en pause (12/11)
+- Agents arrêtés, scan automatique désactivé à la demande de l'utilisateur. Le code et l'historique des trades (branche `gh-pages`) sont conservés.
+
 ## 🧪 Mode exploration (10/11 fin d'après-midi)
 - On teste plus d'idées, plus vite, avec une mise réduite : statut **Exploration** = dans le radar à **demi-risque**, coupé si < −0,20R après 15 trades, post-mortem par l'Analyste.
 - En exploration : **Suivi de tendance (canal, long)** (+0,14R sur 180 j), Pullback de tendance, Faux breakout. Aucune stratégie n'est encore « live » à risque plein.
