@@ -43,6 +43,7 @@ Priorité : P1 = important, P2 = utile, P3 = idée. Chaque agent coche/complète
 - [x] P1 Fiabilité : le scan de 22:43 le 11/11 a écrit un univers vide (tickers Kraken inexploitables) **sans erreur** ; le site affichait « 0 actifs » en vert. Le scan signale maintenant l'erreur, et la pastille passe en orange « ⚠️ incomplet ». Aucun trade n'a été affecté (suivi 1m normal) (produit, 11/11 23h).
 - [ ] P2 Fiabilité : si les tickers sont vides, le scan pourrait réutiliser `prevState.market` au lieu d'écrire un marché vide (à discuter : données périmées signalées comme telles ou rien).
 - [x] P1 « Forme récente » : `stats.lastResults` (10 derniers résultats, testé) → pastilles vert/rouge/gris + espérance sur les 10 derniers sur les cartes et dans le tableau Performance ; « 📉 en baisse » si ≤ −0,20R/trade sur ≥ 5 trades (produit, 12/11 02h).
+- [x] P1 Tag « contre BTC » directif (demande Stratège 12/11 03h30) : « ⛔ Déconseillé… ne le prends pas » + carte atténuée ; trades radar ouverts contre BTC marqués ⚠️ dans le tableau (icône seule sur mobile) (produit, 12/11 05h).
 - [ ] P3 Mobile : la page est très longue (Radar marché = 4 tableaux empilés) ; envisager de replier le Radar marché par défaut sur mobile.
 - [ ] P3 Mobile : les libellés « Stop +0,96 % » / « TP2 −7,70 % » passent sur 2 lignes dans les cases niveaux (raccourcir ou réduire la police).
 - [ ] P3 Mode « pré-alerte » : setup en formation (pas encore validé).
