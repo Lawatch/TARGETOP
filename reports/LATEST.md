@@ -22,10 +22,10 @@
 - **Radar** : 20 clos, **+1,23R**. `trend_pullback@1` 10/18, +1,61R, mais **−5,03R sur ses 12 derniers trades** (E −0,42). **11/11 bouclé vers −4,4R : limite de −6R non franchie.** 3 des 5 ouverts ont touché le TP1 (stop au prix d'entrée) ; il reste ≈ −2R de risque (ZEC long, XRP).
 - **Alerte Stratège** : dynamique négative de `trend_pullback` depuis le rebond, à suivre en glissant sur 15 trades. Labo 11/11 : −35,2R sur 65 trades ; seul `funding_squeeze` est positif (2/3, +1,48R). La règle P0 attend toujours la validation de l'utilisateur.
 
-## 🧠 Stratège · 2026-11-11 21h30 UTC
-- **Cycle de vie** : aucun seuil atteint. `trend_pullback@1` a 18 trades (E +0,09R) et reste `explore` ; le labo est sous 30 trades partout.
-- **`donchian_trend` v2 rejetée** : au re-test, le filtre de volatilité BTC **dégrade** le 90 j (+0,28 → +0,11R) et n'aide plus la 1re moitié du 180 j. C'est un effet de fenêtre, donc pas de version. Leçon ajoutée dans `docs/LESSONS.md` : valider un filtre sur plusieurs fenêtres.
-- **Portefeuille** : positions radar contraires sur ZEC → ajouté à la règle P0 « une seule position radar par actif ». **Utilisateur** : la règle P0 complète attend toujours ta validation (pire cas du jour estimé à −9,4R par l'Analyste).
+## 🧠 Stratège · 2026-11-12 00h30 UTC
+- **Cycle de vie** : aucun seuil atteint. `trend_pullback@1` a 18 trades (E +0,09R, DD 5R) et reste `explore`, mais il est à −0,42R/trade sur ses 12 derniers trades ; si ça continue, la coupe (E < −0,20R) peut arriver vite. Labo : aucune stratégie à 30 trades.
+- **Outillage** : `backtest.mjs --end-days-ago N` permet de valider un filtre sur des fenêtres décalées. Pour le filtre de volatilité sur `donchian_trend`, il aide nettement sur 2 fenêtres sur 3 (+0,20 → +0,49R ; +0,17 → +0,37R), mais pas sur la plus récente. Pas de v2 : la variante labo tranchera.
+- **Reco** : Analyste → suivre `trend_pullback` en glissant sur 15 trades. **Utilisateur** : la règle P0 de portefeuille attend toujours ta validation.
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.

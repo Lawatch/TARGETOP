@@ -262,3 +262,21 @@ Lecture : avec un jour de données en plus, le gain du filtre sur la 1re moitié
 Décision : **pas de v2**. `donchian_trend_vol` reste en labo pour mesurer en live (aucun coût).
 
 Portefeuille : l'Analyste signale deux positions radar **contraires sur ZEC** (`failed_breakout` long + `trend_pullback` short) : en réel, elles s'annulent et paient deux fois les frais. Ajouté à la règle P0 : **une seule position radar par actif**.
+
+## 2026-11-12 00h30 — Stratège : outil `--end-days-ago` + robustesse du filtre de volatilité sur fenêtres décalées (aucun changement)
+
+Cycle de vie : aucun seuil atteint. `trend_pullback@1` a 18 trades, E +0,09R, DD 5R → reste `explore`, mais il est à −0,42R/trade sur ses 12 derniers trades, à suivre. Labo : aucune stratégie à ≥ 30 trades (`trend_pullback_btc` 24, E −0,65R ; `rsi2_pullback` 22, E −0,15R).
+
+Outillage : `src/backtest.mjs --end-days-ago N` fait finir la fenêtre N jours plus tôt. Il sert à valider un filtre sur des périodes décalées (leçon du 11/11). Limite : l'univers reste le top 25 **actuel** par volume (léger biais du survivant).
+
+Application à `donchian_trend` + `btcVolMinPct: 0.33` (90 j / 25 cryptos) :
+
+| Fenêtre (fin) | v1 : 1re / 2e moitié, global | + filtre : 1re / 2e moitié, global |
+|---|---|---|
+| aujourd'hui | +0,46 / −0,36R, +0,28R | +0,26 / −0,45R, **+0,11R** |
+| il y a 30 j | +0,40 / +0,02R, +0,20R | +0,58 / +0,41R, **+0,49R** |
+| il y a 60 j | −0,07 / +0,32R, +0,17R | +0,08 / +0,45R, **+0,37R** |
+
+Lecture : le filtre aide nettement sur 2 fenêtres sur 3 (les 4 moitiés améliorées), mais **échoue sur la plus récente**, dans un marché baissier où cette stratégie long seulement perd de toute façon. Le signal est réel mais pas universel. Il compte justement le plus dans le régime actuel, là où il échoue.
+
+Décision : **pas de v2** (critère « robuste sur toutes les fenêtres » non rempli). `donchian_trend_vol` tourne en labo depuis le correctif d'hier 15h30 : c'est le live qui tranchera. À revoir quand `donchian_trend` ou sa variante auront ≥ 15 trades.

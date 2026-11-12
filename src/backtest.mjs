@@ -1,5 +1,5 @@
 // Backtest walk-forward rapide sur l'historique Kraken Futures (sert au Stratège avant toute modif).
-// Usage : node src/backtest.mjs [--days 30] [--symbols 20] [--strategies trend_pullback,breakout_volume] [--config path.json]
+// Usage : node src/backtest.mjs [--days 30] [--symbols 20] [--end-days-ago 30] [--strategies trend_pullback,breakout_volume] [--config path.json]
 // Hypothèses : entrée à l'ouverture de la bougie 15m suivante, suivi sur bougies 15m (SL prioritaire si ambigu),
 // frais + slippage identiques au live. Le funding n'est pas disponible => funding_squeeze ignoré.
 import fs from 'node:fs';
@@ -29,7 +29,10 @@ strategies = strategies.map((s) => (override[s.id] ? { ...s, params: { ...s.para
 
 const cacheDir = path.join(root, '.cache');
 fs.mkdirSync(cacheDir, { recursive: true });
-const now = Math.floor(Date.now() / 3600e3) * 3600e3; // arrondi à l'heure => cache réutilisable
+let now = Math.floor(Date.now() / 3600e3) * 3600e3; // arrondi à l'heure => cache réutilisable
+// --end-days-ago N : fait finir la fenêtre N jours plus tôt (validation d'un filtre sur des périodes décalées)
+const endDaysAgo = +arg('--end-days-ago', 0);
+if (endDaysAgo) now -= endDaysAgo * 86400e3;
 async function cached(sym, tf, from) {
   const f = path.join(cacheDir, `${sym}_${tf}_${from}_${now}.json`);
   if (fs.existsSync(f)) return JSON.parse(fs.readFileSync(f, 'utf8'));
