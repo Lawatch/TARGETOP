@@ -97,6 +97,14 @@ test('stats', () => {
   assert.equal(s.expectancyR, 0.5);
   assert.equal(s.profitFactor, 2);
   assert.equal(s.maxDrawdownR, 1);
+  assert.deepEqual(s.lastResults, [2, -1]);
+});
+
+test('stats : forme récente = 10 derniers résultats dans l\'ordre chronologique', () => {
+  const ts = Array.from({ length: 13 }, (_, i) => ({ state: 'closed', closeTime: 100 - i, resultR: i }));
+  const s = computeStats(ts);
+  assert.equal(s.lastResults.length, 10);
+  assert.deepEqual(s.lastResults, [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]);
 });
 
 test('reanchor rejette un stop franchi ou un prix trop loin', () => {

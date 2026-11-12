@@ -24,6 +24,9 @@ export function computeStats(trades) {
     avgWinR: wins.length ? round(sumW / wins.length) : null,
     avgLossR: losses.length ? round(-sumL / losses.length) : null,
     last20ExpectancyR: last20.length ? round(last20.reduce((a, b) => a + b, 0) / last20.length) : null,
+    // Forme récente : les 10 derniers résultats (du plus ancien au plus récent), pour repérer une dégradation
+    // que le cumul masque (ex. trend_pullback +0,09R cumulé mais −0,42R sur ses 12 derniers, 12/11).
+    lastResults: rs.slice(-10).map((r) => round(r)),
     curve,
   };
 }

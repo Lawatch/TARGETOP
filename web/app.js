@@ -147,6 +147,16 @@ function beep() { try { const a = new AudioContext(), o = a.createOscillator(), 
 const sigKey = (s) => `${s.symbol}|${s.strategy}|${s.barTime}`;
 
 // ---------- Rendu ----------
+// Forme récente d'une stratégie : 10 derniers résultats live (stats.lastResults, scan ≥ 12/11).
+function form(stratId, small) {
+  const rs = state?.stats?.byStrategy?.[stratId]?.lastResults;
+  if (!rs?.length) return '';
+  const dots = rs.map((r) => `<i class="dot ${r > 0.1 ? 'w' : r < -0.1 ? 'l' : 'b'}" title="${r2(r)}"></i>`).join('');
+  const m = rs.reduce((a, b) => a + b, 0) / rs.length;
+  const bad = rs.length >= 5 && m <= -0.2;
+  if (small) return `<span class="form" title="${rs.length} derniers trades live : ${r2(m)}/trade en moyenne">${dots}</span>`;
+  return `<div class="form-line">Forme : ${dots} <span class="${cls(m)}">${r2(m)}/trade sur les ${rs.length} derniers</span>${bad ? ' <b class="neg">📉 en baisse</b>' : ''}</div>`;
+}
 function reliability(stratId) {
   const s = state?.stats?.byStrategy?.[stratId];
   const n = s?.trades || 0;
@@ -215,6 +225,7 @@ function card(s, compact) {
     </div>
     <div class="live"><span>Prix : <b class="lp">${px(price)}</b> <span class="lpd ${cls(dir * (price - s.entry))}">${price ? pct(((price - s.entry) / s.entry) * 100) : ''}</span></span><span class="tag ${st.cls} lst">${esc(st.txt)}</span></div>
     <div><span class="tag ${rel.cls}">${esc(rel.txt)}</span></div>
+    ${form(s.strategy)}
     ${already(s)}
     ${againstBtc(s) ? `<div><span class="tag bad">⚠️ Contre la tendance BTC 4h (${btcTrend() === 'down' ? 'baissière' : 'haussière'}) : ce type de trade perd en live et en backtest</span></div>` : ''}
     ${compact ? '' : `<ul class="reasons">${(s.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`}
@@ -344,7 +355,7 @@ function renderPerf() {
     const id = key.split('@')[0];
     const meta = strats.find((x) => x.id === id) || {};
     const isCur = meta.version && key.endsWith('@v' + meta.version);
-    return { o: isCur ? rank[meta.status] ?? 4 : 5, t: v.totalR || 0, html: `<tr><td>${name(meta.label || id, key.split('@')[1], isCur ? statusTag(meta.status) : '<span class="tag">ancienne</span>')}</td><td>${v.trades}</td><td class="opt">${v.winRate == null ? '–' : Math.round(v.winRate * 100) + ' %'}</td><td class="${cls(v.expectancyR)}">${r2(v.expectancyR)}</td><td class="${cls(v.totalR)}"><b>${r2(v.totalR)}</b></td><td class="opt">${pfTxt(v.profitFactor)}</td><td class="opt">${!v.maxDrawdownR ? '0R' : '-' + v.maxDrawdownR.toFixed(2) + 'R'}</td></tr>` };
+    return { o: isCur ? rank[meta.status] ?? 4 : 5, t: v.totalR || 0, html: `<tr><td>${name(meta.label || id, key.split('@')[1], isCur ? statusTag(meta.status) + form(id, true) : '<span class="tag">ancienne</span>')}</td><td>${v.trades}</td><td class="opt">${v.winRate == null ? '–' : Math.round(v.winRate * 100) + ' %'}</td><td class="${cls(v.expectancyR)}">${r2(v.expectancyR)}</td><td class="${cls(v.totalR)}"><b>${r2(v.totalR)}</b></td><td class="opt">${pfTxt(v.profitFactor)}</td><td class="opt">${!v.maxDrawdownR ? '0R' : '-' + v.maxDrawdownR.toFixed(2) + 'R'}</td></tr>` };
   });
   const noTrades = strats.filter((s) => !Object.keys(byV).some((k2) => k2.startsWith(s.id + '@'))).map((s) => ({ o: rank[s.status] ?? 4, t: -1e9, html: `<tr><td>${name(s.label, 'v' + s.version, statusTag(s.status))}</td><td colspan="6" class="muted">pas encore de trade clôturé</td></tr>` }));
   const all = [...rows, ...noTrades].sort((x, y) => x.o - y.o || y.t - x.t);
