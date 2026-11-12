@@ -17,10 +17,10 @@
 - Backtest initial honnête : les stratégies « classiques » en 15m perdaient (−0,28R/trade). Passage en 1h + nouvelle stratégie « faux breakout » (+0,12R/trade en backtest 90 j, positive sur les 2 moitiés de la période). Rien n'est prouvé tant qu'on n'a pas 30 trades live.
 - Relais des agents : un passage d'expert par heure (Analyste → Stratège → Produit), chaque rôle toutes les 3 h.
 
-## 🔎 Analyste · 2026-11-12 02h10 UTC (point santé) · rapport complet : `reports/2026-11-11-23h-analyste.md` (prochain à 11h)
-- **Santé** : ✅ 355 runs, aucun trou > 8 min sur 3 h, 0 erreur, dernier à 02:02 UTC (scan moyen 4,5 s).
-- **Radar** : ZEC long `failed_breakout` arrêté juste avant minuit → **11/11 clôturé à −5,40R** (limite −6R, marge 0,6R). Cumul 21 clos, **+0,21R** (PF 1,02) ; **les longs font 1/5, −3,46R**, les shorts 10/16, +3,67R. 6 ouverts : 3 shorts avec TP1 touché (stop au prix d'entrée), XRP short, et 2 nouveaux longs `failed_breakout` (DOGE, LINK) non sécurisés.
-- **Alerte Stratège** : (1) la journée du 11/11 est passée à 0,6R de la limite, ce qui illustre bien le besoin de la règle P0 ; (2) les longs radar sont toujours perdants (4 stops sur 5), et `failed_breakout` vient d'en ouvrir 2 de plus ; (3) le labo `rsi2_pullback` remonte : **6 TP2 en 3 h**, −7,9 → −2,2R (11/23).
+## 🔎 Analyste · 2026-11-12 05h10 UTC (point santé) · rapport complet : `reports/2026-11-11-23h-analyste.md` (prochain à 11h)
+- **Santé** : ✅ 382 runs, aucun trou > 8 min sur 3 h, 0 erreur, dernier à 05:01 UTC ; scan moyen revenu à 3,7 s.
+- **Radar** : DASH short clos à +1,16R. Cumul 22 clos, **+1,36R** ; `trend_pullback@1` 11/19, +2,77R (E +0,15) ; shorts +4,83R, longs −3,46R. 12/11 : +1,16R. 7 ouverts, dont **3 longs `failed_breakout` (DOGE, LINK, UNI) + XRP + XBT non sécurisés** : pire cas du jour ≈ −3,8R (limite −6R ✅).
+- **Note Stratège** : les 3 longs ouverts vont dans le sens que le radar perd jusqu'ici (longs 1/5). Ils serviront à tester en live le tag « contre BTC », s'ils sont tagués. Labo calme (2 clos depuis minuit).
 
 ## 🧠 Stratège · 2026-11-12 03h30 UTC
 - **Cycle de vie** : aucun seuil atteint (`trend_pullback@1` 19 trades, E +0,15R ; labo sous 30 trades). `rsi2_pullback` remonte (+0,31R sur ses 15 derniers trades).
