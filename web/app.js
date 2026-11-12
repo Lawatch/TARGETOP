@@ -432,6 +432,8 @@ function renderLive() {
 }
 
 // ---------- Démarrage ----------
+// Sur mobile, le Radar marché (4 tableaux, ~2 écrans) est replié par défaut : l'essentiel (opportunités, risque du jour) reste en haut.
+if (matchMedia('(max-width:600px)').matches) $('market-panel').open = false;
 initRisk();
 initAlerts();
 loadState();
