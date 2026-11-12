@@ -280,3 +280,25 @@ Application à `donchian_trend` + `btcVolMinPct: 0.33` (90 j / 25 cryptos) :
 Lecture : le filtre aide nettement sur 2 fenêtres sur 3 (les 4 moitiés améliorées), mais **échoue sur la plus récente**, dans un marché baissier où cette stratégie long seulement perd de toute façon. Le signal est réel mais pas universel. Il compte justement le plus dans le régime actuel, là où il échoue.
 
 Décision : **pas de v2** (critère « robuste sur toutes les fenêtres » non rempli). `donchian_trend_vol` tourne en labo depuis le correctif d'hier 15h30 : c'est le live qui tranchera. À revoir quand `donchian_trend` ou sa variante auront ≥ 15 trades.
+
+## 2026-11-12 03h30 — Stratège : `failed_breakout` + filtre BTC sur 4 fenêtres (aucun changement de version)
+
+Cycle de vie : aucun seuil atteint. `trend_pullback@1` : 19 trades, E +0,15R, DD 5R, mais −0,11R sur les 15 derniers. `failed_breakout@1` : 3 trades. Labo : aucune stratégie à ≥ 30 trades (`trend_pullback_btc` 24, E −0,65R ; `rsi2_pullback` remonte à E −0,10R, +0,31R sur ses 15 derniers trades).
+
+Alerte de l'Analyste : les longs radar font 1/5 (−3,46R) et `failed_breakout` vient d'ouvrir 2 longs contre BTC 4h. Test de `btcRegime: "with"` sur `failed_breakout` (25 cryptos, outil `--end-days-ago`) :
+
+| Fenêtre | v1 : exp. (moitiés) | v1 : DD | + filtre BTC : exp. (moitiés) | + filtre BTC : DD |
+|---|---|---|---|---|
+| 180 j, fin aujourd'hui | −0,07R (−0,18 / +0,05) | 146R | **+0,03R** (−0,07 / +0,17) | **57R** |
+| 90 j, fin aujourd'hui | +0,05R (0,00 / +0,10) | 49R | **+0,15R** (+0,08 / +0,22) | **27R** |
+| 90 j, fin −30 j | −0,05R (−0,08 / 0,00) | 70R | −0,03R (−0,06 / 0,00) | **34R** |
+| 90 j, fin −60 j | −0,10R (−0,20 / +0,02) | 94R | −0,11R (−0,26 / +0,11) | **55R** |
+
+Lecture :
+- **Le filtre BTC divise le drawdown par environ 2 sur les 4 fenêtres**. C'est le résultat le plus robuste obtenu à ce jour, et le drawdown est le vrai risque du challenge.
+- L'espérance s'améliore sur 2 fenêtres sur 4 et reste stable sur les 2 autres. Mais **`failed_breakout` n'a pas d'avantage démontré**, avec ou sans filtre : +0,03R sur 180 j, sous le seuil `explore` de +0,08R. La v1 est en `explore` par l'exception de démarrage, pas par ses chiffres.
+
+Décision : **pas de v2**. Une v2 qui ne remplit pas elle-même les critères `explore` serait une zone grise des règles. Mesures sans changement de stratégie :
+1. Le tag « ⚠️ contre BTC 4h » des cartes applique ce filtre **à la main** : recommandation explicite au trader de ne pas prendre ces signaux.
+2. Si `failed_breakout@1` atteint 15 trades sans avantage, discuter son passage en `shadow` (critères de coupe : E < −0,20R ou DD > 8R).
+3. Le filtre BTC devient le candidat n° 1 pour toute future stratégie de retournement (réduction du drawdown).

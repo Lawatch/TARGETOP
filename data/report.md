@@ -22,10 +22,10 @@
 - **Radar** : ZEC long `failed_breakout` arrêté juste avant minuit → **11/11 clôturé à −5,40R** (limite −6R, marge 0,6R). Cumul 21 clos, **+0,21R** (PF 1,02) ; **les longs font 1/5, −3,46R**, les shorts 10/16, +3,67R. 6 ouverts : 3 shorts avec TP1 touché (stop au prix d'entrée), XRP short, et 2 nouveaux longs `failed_breakout` (DOGE, LINK) non sécurisés.
 - **Alerte Stratège** : (1) la journée du 11/11 est passée à 0,6R de la limite, ce qui illustre bien le besoin de la règle P0 ; (2) les longs radar sont toujours perdants (4 stops sur 5), et `failed_breakout` vient d'en ouvrir 2 de plus ; (3) le labo `rsi2_pullback` remonte : **6 TP2 en 3 h**, −7,9 → −2,2R (11/23).
 
-## 🧠 Stratège · 2026-11-12 00h30 UTC
-- **Cycle de vie** : aucun seuil atteint. `trend_pullback@1` a 18 trades (E +0,09R, DD 5R) et reste `explore`, mais il est à −0,42R/trade sur ses 12 derniers trades ; si ça continue, la coupe (E < −0,20R) peut arriver vite. Labo : aucune stratégie à 30 trades.
-- **Outillage** : `backtest.mjs --end-days-ago N` permet de valider un filtre sur des fenêtres décalées. Pour le filtre de volatilité sur `donchian_trend`, il aide nettement sur 2 fenêtres sur 3 (+0,20 → +0,49R ; +0,17 → +0,37R), mais pas sur la plus récente. Pas de v2 : la variante labo tranchera.
-- **Reco** : Analyste → suivre `trend_pullback` en glissant sur 15 trades. **Utilisateur** : la règle P0 de portefeuille attend toujours ta validation.
+## 🧠 Stratège · 2026-11-12 03h30 UTC
+- **Cycle de vie** : aucun seuil atteint (`trend_pullback@1` 19 trades, E +0,15R ; labo sous 30 trades). `rsi2_pullback` remonte (+0,31R sur ses 15 derniers trades).
+- **Labo** : sur `failed_breakout`, le filtre BTC 4h **divise le drawdown par ~2 sur les 4 fenêtres testées** (146 → 57R sur 180 j) et améliore l'espérance sur 2 d'entre elles. Mais la stratégie reste sans avantage démontré (+0,03R sur 180 j avec filtre), donc pas de v2.
+- **Reco** : Produit → rendre le tag « contre BTC » directif (« déconseillé »). **Trader** : éviter les signaux contre la tendance BTC 4h, ce qui revient à appliquer le filtre à la main. **Utilisateur** : la règle P0 de portefeuille attend toujours ta validation (le 11/11 a fini à −5,40R, à 0,6R de la limite).
 
 ## 🛠️ Produit · 2026-11-10 13h50 UTC
 - **Vu** : scan frais (13:46 UTC, 0 erreur), 3 opportunités actives, toutes SHORT. Aucun bug bloquant ; 0 erreur console sur desktop et mobile.
