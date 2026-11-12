@@ -211,7 +211,7 @@ function card(s, compact) {
   const rel = reliability(s.strategy);
   const dir = s.side === 'long' ? 1 : -1;
   const d = (lvl) => pct(((lvl - s.entry) / s.entry) * 100, 2);
-  const node = el(`<div class="card ${s.side} ${st.stale ? 'stale' : ''}" data-key="${esc(sigKey(s))}">
+  const node = el(`<div class="card ${s.side} ${st.stale ? 'stale' : ''} ${againstBtc(s) ? 'contra' : ''}" data-key="${esc(sigKey(s))}">
     <div class="card-head">
       <div><span class="side ${s.side}">${s.side === 'long' ? 'LONG' : 'SHORT'}</span><span class="sym">${esc(sym(s.symbol))}</span></div>
       <div><span class="score" title="Score de setup (0-100) : non calibré, il ne prédit pas le résultat (test 180 j). À ne pas utiliser pour choisir.">score ${s.score}</span></div>
@@ -227,7 +227,7 @@ function card(s, compact) {
     <div><span class="tag ${rel.cls}">${esc(rel.txt)}</span></div>
     ${form(s.strategy)}
     ${already(s)}
-    ${againstBtc(s) ? `<div><span class="tag bad">⚠️ Contre la tendance BTC 4h (${btcTrend() === 'down' ? 'baissière' : 'haussière'}) : ce type de trade perd en live et en backtest</span></div>` : ''}
+    ${againstBtc(s) ? `<div><span class="tag bad">⛔ Déconseillé : contre la tendance BTC 4h (${btcTrend() === 'down' ? 'baissière' : 'haussière'}). Ce type de trade perd en live et en backtest, ne le prends pas.</span></div>` : ''}
     ${compact ? '' : `<ul class="reasons">${(s.reasons || []).map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`}
     <div class="size"><button class="copy">copier</button>${sizing(s, price)}</div>
   </div>`);
@@ -318,7 +318,7 @@ function renderOpen() {
   const table = (ts) => `<div class="tablewrap"><table class="opent"><thead><tr><th>Actif</th><th class="opt">Sens</th><th class="opt">Stratégie</th><th class="opt">Entrée</th><th>Stop</th><th class="opt">TP1</th><th class="opt">TP2</th><th>Prix</th><th>R live</th><th class="opt">Depuis</th></tr></thead><tbody>${ts.map((t) => {
     const r = tradeR(t);
     const clash = t.status !== 'shadow' && opposite(t);
-    return `<tr data-sym="${esc(t.symbol)}" data-id="${esc(t.id)}"${clash ? ' class="clash"' : ''}><td><b>${esc(sym(t.symbol))}</b>${clash ? ' <span class="tag bad" title="Un trade radar de sens opposé est ouvert sur le même actif">⇄</span>' : ''} <span class="mside ${t.side}">${t.side === 'long' ? '▲ L' : '▼ S'}</span></td><td class="opt"><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td class="opt">${esc(t.strategy)} ${t.status === 'shadow' ? '<span class="tag">labo</span>' : t.status === 'explore' ? '<span class="tag warn">🧪</span>' : ''}</td><td class="opt">${px(t.entry)}</td><td>${px(t.sl)}${t.tp1Hit ? ' <span class="tag ok">BE</span>' : ''}</td><td class="opt">${px(t.tp1)}</td><td class="opt">${px(t.tp2)}</td><td class="lp">${px(live[t.symbol] ?? t.price)}</td><td class="lr ${cls(r)}"><b>${r2(r)}</b></td><td class="opt">${ago(t.openTime)}</td></tr>`;
+    return `<tr data-sym="${esc(t.symbol)}" data-id="${esc(t.id)}"${clash ? ' class="clash"' : ''}><td><b>${esc(sym(t.symbol))}</b>${clash ? ' <span class="tag bad" title="Un trade radar de sens opposé est ouvert sur le même actif">⇄</span>' : ''}${t.status !== 'shadow' && againstBtc(t) ? ' <span class="tag warn" title="Ouvert contre la tendance BTC 4h : ce type de trade perd en live et en backtest. Surveille-le de près.">⚠️<span class="lbl"> BTC</span></span>' : ''} <span class="mside ${t.side}">${t.side === 'long' ? '▲ L' : '▼ S'}</span></td><td class="opt"><span class="side ${t.side}">${t.side === 'long' ? 'LONG' : 'SHORT'}</span></td><td class="opt">${esc(t.strategy)} ${t.status === 'shadow' ? '<span class="tag">labo</span>' : t.status === 'explore' ? '<span class="tag warn">🧪</span>' : ''}</td><td class="opt">${px(t.entry)}</td><td>${px(t.sl)}${t.tp1Hit ? ' <span class="tag ok">BE</span>' : ''}</td><td class="opt">${px(t.tp1)}</td><td class="opt">${px(t.tp2)}</td><td class="lp">${px(live[t.symbol] ?? t.price)}</td><td class="lr ${cls(r)}"><b>${r2(r)}</b></td><td class="opt">${ago(t.openTime)}</td></tr>`;
   }).join('')}</tbody></table></div>`;
   const wasOpen = !!document.querySelector('#open details[open]'); // garder le tiroir ouvert au rafraîchissement
   const labR = lab.reduce((a, t) => a + (tradeR(t) || 0), 0);
